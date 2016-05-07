@@ -44,7 +44,7 @@
 !.editorconfig
 
 # track readme.md in the root (i.e. do NOT ignore it)
-!readme.md
+!README.md
 
 # track composer.json and composer.lock
 !composer.*
