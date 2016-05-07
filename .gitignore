@@ -49,6 +49,9 @@
 # track composer.json and composer.lock
 !composer.*
 
+# track wp-config.php
+!wp-config.php
+
 # ignore all files that start with ~
 ~*
 
