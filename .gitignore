@@ -52,6 +52,9 @@
 # track wp-config.php
 !wp-config.php
 
+# track setup.sh
+!setup.sh
+
 # ignore all files that start with ~
 ~*
 
