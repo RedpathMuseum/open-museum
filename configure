@@ -13,5 +13,4 @@ ln -s $current_dir/wp-content $current_dir/wp/wp-content
 
 # Symlink wp-config.php
 echo "Symlinking wp-config.php"
-rm $current_dir/wp/wp-config.php
 ln -s $current_dir/wp-config.php $current_dir/wp/wp-config.php
