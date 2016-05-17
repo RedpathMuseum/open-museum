@@ -8,5 +8,5 @@ git clone https://github.com/RedpathMuseum/open-museum
 ```
 2. Setup wordpress
 ```
-./setup.sh
+./configure
 ```
