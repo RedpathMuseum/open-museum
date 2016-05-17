@@ -8,7 +8,7 @@
     "require": {
         "php": ">=5.4",
         "johnpbloch/wordpress": "4.2",
-        "wpackagist-theme/jshop": "2.8"
+        "wpackagist-theme/onetake": "1.2.8"
     },
     "extra": {
         "wordpress-install-dir": "wp"

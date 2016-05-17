@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f7469bad0e52ef33cc73bebbe3f617c9",
-    "content-hash": "a722d4368fb42674e2c34969f558f6da",
+    "hash": "75e938475c76a8f9297c09ba1633b81b",
+    "content-hash": "fff02784183ff63ee3e0a11fbe37db85",
     "packages": [
         {
             "name": "composer/installers",
@@ -193,16 +193,16 @@
             "time": "2015-06-11 15:15:30"
         },
         {
-            "name": "wpackagist-theme/jshop",
-            "version": "2.8",
+            "name": "wpackagist-theme/onetake",
+            "version": "1.2.8",
             "source": {
                 "type": "svn",
-                "url": "https://themes.svn.wordpress.org/jshop/",
-                "reference": "2.8"
+                "url": "https://themes.svn.wordpress.org/onetake/",
+                "reference": "1.2.8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://downloads.wordpress.org/theme/jshop.2.8.zip",
+                "url": "https://downloads.wordpress.org/theme/onetake.1.2.8.zip",
                 "reference": null,
                 "shasum": null
             },
@@ -210,7 +210,7 @@
                 "composer/installers": "~1.0"
             },
             "type": "wordpress-theme",
-            "homepage": "https://wordpress.org/themes/jshop/"
+            "homepage": "https://wordpress.org/themes/onetake/"
         }
     ],
     "packages-dev": [],
