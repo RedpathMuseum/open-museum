@@ -17,6 +17,10 @@ body {
   padding-bottom: 20px;
 }
 
+img {
+  width: 100%;
+}
+
 /* Everything but the jumbotron gets side spacing for mobile first views */
 .header,
 .marketing,
@@ -61,7 +65,9 @@ body {
 
 /* Supporting marketing content */
 .marketing {
-  margin: 40px 0;
+  /*margin: 40px 0;*/
+  margin-left: 5px;
+  margin-right: 5px;
   p + h4 {
     margin-top: 28px;
   }
