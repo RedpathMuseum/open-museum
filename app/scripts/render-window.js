@@ -11,7 +11,7 @@ animate();
 function init() {
 
     // HTML Container for the 3D widget
-    var canvas3D = document.getElementById("canvas3D");
+    var canvas3D = document.getElementById('canvas3D');
 
     //Uncomment or place in main.css to set the canvas parameters
     // creaeting canvas for render window
@@ -35,8 +35,8 @@ function init() {
 
     scene.add( camera ); // required, because we are adding a light as a child of the camera
 
-    // var cube = new THREE.Mesh( new THREE.CubeGeometry(1,1,1), new THREE.MeshNormalMaterial() );
-    // scene.add(cube);
+    var cube = new THREE.Mesh( new THREE.CubeGeometry(1,1,1), new THREE.MeshNormalMaterial() );
+    scene.add(cube);
 
 
 
@@ -52,15 +52,15 @@ function init() {
     var light = new THREE.PointLight( 0xffffff, 0.8 );
     camera.add( light );
 
-    // camera.lookAt(cube.position)
-    // camera.position.x=cube.position.x;
-    // camera.position.y=cube.position.y;
-    // camera.position.z=CAMERA_DISTANCE;
+    camera.lookAt(cube.position)
+    camera.position.x=cube.position.x;
+    camera.position.y=cube.position.y;
+    camera.position.z=CAMERA_DISTANCE;
 
-    //Uncomment when STLLoader.js will be usuable
+  //Loading a .stl file
     var loader = new THREE.STLLoader();
 
-    loader.load( 'app/models/kaplan.STL', function ( geometry ) {
+    loader.load( '../models/kaplan.STL', function ( geometry ) {
 
         var material = new THREE.MeshPhongMaterial( { color: 0xff5533 } );
         mesh = new THREE.Mesh( geometry, material );
@@ -72,10 +72,36 @@ function init() {
         camera.position.z=CAMERA_DISTANCE;
 
        }
-
-
-
       );
+
+      //Loading a .obj file
+      //TODO:
+      //Successfully load the original texture
+
+      var texture = new THREE.Texture();
+				var onProgress = function ( xhr ) {
+					if ( xhr.lengthComputable ) {
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+					}
+				};
+				var onError = function ( xhr ) {
+				};
+
+      var manager = new THREE.LoadingManager();
+      // model
+				var loader = new THREE.OBJLoader( manager );
+				loader.load( '../models/Trott_life_tentacules_with_colors_smooth_E_texture.obj', function ( object ) {
+
+          object.traverse( function ( child ) {
+						if ( child instanceof THREE.Mesh ) {
+							child.material.map = texture;
+						}
+					} );
+					object.position.y = - 95;
+					scene.add( object );
+				}, onProgress, onError );
+
 
 }
 
