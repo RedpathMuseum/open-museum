@@ -191,7 +191,7 @@ THREE.OBJLoader.prototype = {
 				// overwrite the inherited material. Exception being that there was already face declarations
 				// to the inherited material, then it will be preserved for proper MultiMaterial continuation.
 
-				if ( previousMaterial && previousMaterial.name && typeof previousMaterial.clone === "function" ) {
+				if ( previousMaterial && previousMaterial.name && typeof previousMaterial.clone === 'function' ) {
 
 					var declared = previousMaterial.clone( 0 );
 					declared.inherited = true;
@@ -477,11 +477,11 @@ THREE.OBJLoader.prototype = {
 
 				} else {
 
-					throw new Error( "Unexpected vertex/normal/uv line: '" + line  + "'" );
+					throw new Error( 'Unexpected vertex/normal/uv line: \'' + line  + '\'' );
 
 				}
 
-			} else if ( lineFirstChar === "f" ) {
+			} else if ( lineFirstChar === 'f' ) {
 
 				if ( ( result = this.regexp.face_vertex_uv_normal.exec( line ) ) !== null ) {
 
@@ -530,16 +530,16 @@ THREE.OBJLoader.prototype = {
 
 				} else {
 
-					throw new Error( "Unexpected face line: '" + line  + "'" );
+					throw new Error( 'Unexpected face line: \'' + line  + '\'' );
 
 				}
 
-			} else if ( lineFirstChar === "l" ) {
+			} else if ( lineFirstChar === 'l' ) {
 
-				var lineParts = line.substring( 1 ).trim().split( " " );
+				var lineParts = line.substring( 1 ).trim().split( ' ' );
 				var lineVertices = [], lineUVs = [];
 
-				if ( line.indexOf( "/" ) === - 1 ) {
+				if ( line.indexOf( '/' ) === - 1 ) {
 
 					lineVertices = lineParts;
 
@@ -547,10 +547,10 @@ THREE.OBJLoader.prototype = {
 
 					for ( var li = 0, llen = lineParts.length; li < llen; li ++ ) {
 
-						var parts = lineParts[ li ].split( "/" );
+						var parts = lineParts[ li ].split( '/' );
 
-						if ( parts[ 0 ] !== "" ) lineVertices.push( parts[ 0 ] );
-						if ( parts[ 1 ] !== "" ) lineUVs.push( parts[ 1 ] );
+						if ( parts[ 0 ] !== '' ) lineVertices.push( parts[ 0 ] );
+						if ( parts[ 1 ] !== '' ) lineUVs.push( parts[ 1 ] );
 
 					}
 
@@ -604,7 +604,7 @@ THREE.OBJLoader.prototype = {
 				// Handle null terminated files without exception
 				if ( line === '\0' ) continue;
 
-				throw new Error( "Unexpected line: '" + line  + "'" );
+				throw new Error( 'Unexpected line: \'' + line  + '\'' );
 
 			}
 
