@@ -241,7 +241,7 @@ THREE.STLLoader.prototype = {
 
 	ensureString: function ( buf ) {
 
-		if ( typeof buf !== "string" ) {
+		if ( typeof buf !== 'string' ) {
 
 			var array_buffer = new Uint8Array( buf );
 			var str = '';
@@ -262,7 +262,7 @@ THREE.STLLoader.prototype = {
 
 	ensureBinary: function ( buf ) {
 
-		if ( typeof buf === "string" ) {
+		if ( typeof buf === 'string' ) {
 
 			var array_buffer = new Uint8Array( buf.length );
 			for ( var i = 0; i < buf.length; i ++ ) {
@@ -289,7 +289,7 @@ if ( typeof DataView === 'undefined' ) {
 		this.buffer = buffer;
 		this.byteOffset = byteOffset || 0;
 		this.byteLength = byteLength || buffer.byteLength || buffer.length;
-		this._isString = typeof buffer === "string";
+		this._isString = typeof buffer === 'string';
 
 	};
 
