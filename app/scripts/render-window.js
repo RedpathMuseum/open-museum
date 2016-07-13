@@ -4,6 +4,30 @@ var LENGTH = 800;
 var CAMERA_DISTANCE = -20;
 
 
+//Variables for Raycaster
+var x;
+var y;
+var raycaster;
+var mesh;
+var line;
+var mouseHelper;
+var mouse = new THREE.Vector2();
+
+var intersection = {
+intersects: false,
+point: new THREE.Vector3(),
+normal: new THREE.Vector3()
+};
+
+var p = new THREE.Vector3( 0, 0, 0 );
+var r = new THREE.Vector3( 0, 0, 0 );
+var s = new THREE.Vector3( 10, 10, 10 );
+var up = new THREE.Vector3( 0, 1, 0 );
+var check = new THREE.Vector3( 1, 1, 1 );
+
+//Variables for Raycaster
+
+
 
 init();
 animate();
@@ -35,8 +59,8 @@ function init() {
 
     scene.add( camera ); // required, because we are adding a light as a child of the camera
 
-    var cube = new THREE.Mesh( new THREE.CubeGeometry(1,1,1), new THREE.MeshNormalMaterial() );
-    scene.add(cube);
+    var mesh = new THREE.Mesh( new THREE.CubeGeometry(1,1,1), new THREE.MeshNormalMaterial() );
+    scene.add(mesh);
 
 
 
@@ -52,9 +76,9 @@ function init() {
     var light = new THREE.PointLight( 0xffffff, 0.8 );
     camera.add( light );
 
-    camera.lookAt(cube.position)
-    camera.position.x=cube.position.x;
-    camera.position.y=cube.position.y;
+    camera.lookAt(mesh.position)
+    camera.position.x=mesh.position.x;
+    camera.position.y=mesh.position.y;
     camera.position.z=CAMERA_DISTANCE;
 
   //Loading a .stl file
@@ -103,7 +127,83 @@ function init() {
 				}, onProgress, onError );
 
 
+
+        //Code for Raycaster
+
+        var geometry = new THREE.Geometry();
+        geometry.vertices.push( new THREE.Vector3(), new THREE.Vector3() );
+        
+
+        controls = new THREE.TrackballControls( camera, canvas3D );
+      	controls.minDistance = 50;
+      	controls.maxDistance = 200;
+
+        raycaster = new THREE.Raycaster()
+
+        mouseHelper = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 10 ), new THREE.MeshNormalMaterial() );
+        mouseHelper.visible = false;
+        scene.add( mouseHelper );
+
+        line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { linewidth: 4 } ) );
+      	scene.add( line );
+
+        window.addEventListener( 'resize', onWindowResize, false );
+        var moved = false;
+        controls.addEventListener( 'change', function() {
+          moved = true;
+        } );
+        window.addEventListener( 'mousedown', function () {
+          moved = false;
+        }, false );
+        window.addEventListener( 'mouseup', function() {
+          checkIntersection();
+          if ( ! moved ) shoot();
+        } );
+        window.addEventListener( 'mousemove', onTouchMove );
+        window.addEventListener( 'touchmove', onTouchMove );
+        function onTouchMove( event ) {
+          if ( event.changedTouches ) {
+            x = event.changedTouches[ 0 ].pageX;
+            y = event.changedTouches[ 0 ].pageY;
+          } else {
+            x = event.clientX;
+            y = event.clientY;
+          }
+          mouse.x = ( x / window.innerWidth ) * 2 - 1;
+          mouse.y = - ( y / window.innerHeight ) * 2 + 1;
+          checkIntersection();
+        }
+        function checkIntersection() {
+          if ( ! mesh ) return;
+          raycaster.setFromCamera( mouse, camera );
+          var intersects = raycaster.intersectObjects( [ mesh ] );
+          if ( intersects.length > 0 ) {
+            var p = intersects[ 0 ].point;
+            mouseHelper.position.copy( p );
+            intersection.point.copy( p );
+            var n = intersects[ 0 ].face.normal.clone();
+            n.multiplyScalar( 10 );
+            n.add( intersects[ 0 ].point );
+            intersection.normal.copy( intersects[ 0 ].face.normal );
+            mouseHelper.lookAt( n );
+            line.geometry.vertices[ 0 ].copy( intersection.point );
+            line.geometry.vertices[ 1 ].copy( n );
+            line.geometry.verticesNeedUpdate = true;
+            intersection.intersects = true;
+          }
+          else {
+            intersection.intersects = false;
+          }
+      }
+
+
+      //Code for Raycaster
+
+
 }
+
+
+
 
 
 
