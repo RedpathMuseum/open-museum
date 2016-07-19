@@ -3,12 +3,28 @@ var WIDTH = 800;
 var LENGTH = 800;
 var CAMERA_DISTANCE = -20;
 
+var camcounter =0;
+var camPLcounter = 0;
+var numOfAnnotations = 3;
+
+var camlookatpoints = [];
+camlookatpoints[0] = new THREE.Vector3(119, 116, 293);
+camlookatpoints[1] = new THREE.Vector3(75, 73, 57);
+camlookatpoints[2] = new THREE.Vector3(105, 95, 2);
+
+var campositions = [];
+campositions[0] = new THREE.Vector3(119, 116, 303);
+campositions[1] = new THREE.Vector3(68, 67, 54);
+campositions[2] = new THREE.Vector3(103, 93, -7);
+
 
 //Variables for Raycaster
 var x;
 var y;
 var raycaster;
 var mesh;
+var stl_1 = new THREE.Mesh();
+var cube;
 var line;
 var mouseHelper;
 var mouse = new THREE.Vector2();
@@ -18,6 +34,9 @@ intersects: false,
 point: new THREE.Vector3(),
 normal: new THREE.Vector3()
 };
+
+var camlookatpoint = THREE.Vector3();
+var camposalongnormal = THREE.Vector3();
 
 var p = new THREE.Vector3( 0, 0, 0 );
 var r = new THREE.Vector3( 0, 0, 0 );
@@ -59,8 +78,8 @@ function init() {
 
     scene.add( camera ); // required, because we are adding a light as a child of the camera
 
-    var mesh = new THREE.Mesh( new THREE.CubeGeometry(1,1,1), new THREE.MeshNormalMaterial() );
-    scene.add(mesh);
+    var cube = new THREE.Mesh( new THREE.CubeGeometry(1,1,1), new THREE.MeshNormalMaterial() );
+    scene.add(cube);
 
 
 
@@ -68,7 +87,7 @@ function init() {
     scene.add( axisHelper );
 
     // Controlls
-    controls = new THREE.TrackballControls( camera, canvas3D );
+    //controls = new THREE.TrackballControls( camera, canvas3D );
 
     // lights
     scene.add( new THREE.AmbientLight( 0x222222 ) );
@@ -76,10 +95,10 @@ function init() {
     var light = new THREE.PointLight( 0xffffff, 0.8 );
     camera.add( light );
 
-    camera.lookAt(mesh.position)
-    camera.position.x=mesh.position.x;
-    camera.position.y=mesh.position.y;
-    camera.position.z=CAMERA_DISTANCE;
+    // camera.lookAt(mesh.position)
+    // camera.position.x=mesh.position.x;
+    // camera.position.y=mesh.position.y;
+    // camera.position.z=CAMERA_DISTANCE;
 
   //Loading a .stl file
     var loader = new THREE.STLLoader();
@@ -88,15 +107,20 @@ function init() {
 
         var material = new THREE.MeshPhongMaterial( { color: 0xff5533 } );
         mesh = new THREE.Mesh( geometry, material );
-
+        stl_1 = mesh.clone();
         scene.add( mesh );
-        camera.lookAt(mesh.position)
-        camera.position.x=mesh.position.x;
-        camera.position.y=mesh.position.y;
-        camera.position.z=CAMERA_DISTANCE;
 
        }
       );
+
+      // camera.lookAt(stl_1.position)
+      // camera.position.x=stl_1.position.x - 40;
+      // camera.position.y=stl_1.position.y + 40 ;
+      // camera.position.z=CAMERA_DISTANCE+20;
+      //
+      // controls.target = new THREE.Vector3(stl_1.position.x, stl_1.position.y, CAMERA_DISTANCE);
+      // controls.minDistance = 50;
+      // controls.maxDistance = 200;
 
       //Loading a .obj file
       //TODO:
@@ -132,11 +156,11 @@ function init() {
 
         var geometry = new THREE.Geometry();
         geometry.vertices.push( new THREE.Vector3(), new THREE.Vector3() );
-        
 
-        controls = new THREE.TrackballControls( camera, canvas3D );
-      	controls.minDistance = 50;
-      	controls.maxDistance = 200;
+
+        //controls = new THREE.TrackballControls( camera, canvas3D );
+      	//controls.minDistance = 50;
+      	//controls.maxDistance = 200;
 
         raycaster = new THREE.Raycaster()
 
@@ -149,9 +173,9 @@ function init() {
 
         window.addEventListener( 'resize', onWindowResize, false );
         var moved = false;
-        controls.addEventListener( 'change', function() {
-          moved = true;
-        } );
+        // controls.addEventListener( 'change', function() {
+        //   moved = true;
+        // } );
         window.addEventListener( 'mousedown', function () {
           moved = false;
         }, false );
@@ -161,6 +185,10 @@ function init() {
         } );
         window.addEventListener( 'mousemove', onTouchMove );
         window.addEventListener( 'touchmove', onTouchMove );
+
+        window.addEventListener("keydown", leftArrowKeyDown, false);
+
+
         function onTouchMove( event ) {
           if ( event.changedTouches ) {
             x = event.changedTouches[ 0 ].pageX;
@@ -173,6 +201,7 @@ function init() {
           mouse.y = - ( y / window.innerHeight ) * 2 + 1;
           checkIntersection();
         }
+
         function checkIntersection() {
           if ( ! mesh ) return;
           raycaster.setFromCamera( mouse, camera );
@@ -182,7 +211,11 @@ function init() {
             mouseHelper.position.copy( p );
             intersection.point.copy( p );
             var n = intersects[ 0 ].face.normal.clone();
+            console.log("before mult scalar");
+            console.log(n);
             n.multiplyScalar( 10 );
+            console.log("Ater multscalar before adding p");
+            console.log(n);
             n.add( intersects[ 0 ].point );
             intersection.normal.copy( intersects[ 0 ].face.normal );
             mouseHelper.lookAt( n );
@@ -190,11 +223,24 @@ function init() {
             line.geometry.vertices[ 1 ].copy( n );
             line.geometry.verticesNeedUpdate = true;
             intersection.intersects = true;
+            console.log("interesect normal after mult scalar ");
+            console.log(n);
+            console.log("intersect point ");
+            console.log(p);
+            camlookatpoint = line.geometry.vertices[ 0 ].copy( intersection.point );
+            console.log("camlookatpoint");
+            console.log(camlookatpoint);
+            camposalongnormal = line.geometry.vertices[ 1 ].copy( n );
+            console.log("camposalongnormal");
+            console.log(camposalongnormal);
+
           }
           else {
             intersection.intersects = false;
           }
       }
+
+
 
 
       //Code for Raycaster
@@ -203,6 +249,63 @@ function init() {
 }
 
 
+function leftArrowKeyDown(event) {
+  var keyCode = event.keyCode;
+  if(keyCode==37) {
+    console.log("You hit the left arrow key.");
+    console.log(camlookatpoints[camcounter]);
+    console.log(campositions[camcounter]);
+      camera.lookAt(camlookatpoints[camcounter]);
+      camera.position.x=campositions[camcounter].x;
+      camera.position.y=campositions[camcounter].y;
+      camera.position.z=CAMERA_DISTANCE+ 10;
+
+
+      if (camcounter != numOfAnnotations -1) {
+        camcounter+= 1;
+      }
+      else {
+        camcounter = 0;
+      }
+
+    }
+    else {
+    console.log("Oh no you didn't.");
+    }
+}
+
+
+function shoot() {
+
+  console.log('shooting');
+  // var camlookatpoints = {
+  //   look1: new THREE.Vector3(119, 116, 293),
+  //   look2: new THREE.Vector3(75, 73, 57),
+  //   look3: new THREE.Vector3(105, 95, 2)
+  // };
+  // var camposition = {
+  //   pos1: new THREE.Vector3(119, 116, 303),
+  //   pos2: new THREE.Vector3(68, 67, 54),
+  //   pos3: new THREE.Vector3(103, 93, -7)
+  // };
+
+  // var look = new THREE.Vector3(119, 116, 293 );
+  // var pos = new THREE.Vector3(119, 116, 303);
+  //
+  // camera.lookAt(stl_1.position);
+  // camera.position.x=stl_1.position.x - camcounter*10;
+  // camera.position.y=stl_1.position.y + camcounter*10 ;
+  // camera.position.z=CAMERA_DISTANCE+20*camcounter;
+
+  // camera.lookAt(look);
+  // camera.position.x=pos.x ;
+  // camera.position.y=pos.y ;
+  // camera.position.z=pos.z + 100*camcounter;
+
+
+  //camcounter += 1;
+  //console.log(camcounter);
+}
 
 
 
@@ -222,13 +325,24 @@ function onWindowResize() {
 function animate() {
 
     requestAnimationFrame( animate );
-    controls.update();
+    //controls.update();
     render();
 
 }
 
 function render() {
 
-    camera.lookAt( scene.position );
+    //camera.lookAt( scene.position );
     renderer.render( scene, camera );
+
+    var intersects = raycaster.intersectObjects(scene.children);
+    //console.log(intersects);
+
+    // camera.lookAt(stl_1.position)
+    // camera.position.x=stl_1.position.x - camcounter*10;
+    // camera.position.y=stl_1.position.y + camcounter*10 ;
+    // camera.position.z=CAMERA_DISTANCE+20;
+    //
+    // camcounter += 1;
+    // console.log(camcounter);
 }
