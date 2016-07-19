@@ -1,4 +1,4 @@
-var container, camera, scene, renderer, mesh, controls;
+var container, camera, scene, renderer,LeePerryMesh, controls;
 var WIDTH = 800;
 var LENGTH = 800;
 var CAMERA_DISTANCE = -20;
@@ -8,14 +8,19 @@ var camPLcounter = 0;
 var numOfAnnotations = 3;
 
 var camlookatpoints = [];
-camlookatpoints[0] = new THREE.Vector3(119, 116, 293);
+// camlookatpoints[0] = new THREE.Vector3(119, 116, 293);
+camlookatpoints[0] = new THREE.Vector3(7, -12, -17);
 camlookatpoints[1] = new THREE.Vector3(75, 73, 57);
 camlookatpoints[2] = new THREE.Vector3(105, 95, 2);
 
 var campositions = [];
-campositions[0] = new THREE.Vector3(119, 116, 303);
+//campositions[0] = new THREE.Vector3(119, 116, 303);
+campositions[0] = new THREE.Vector3(10, -6, -24);
 campositions[1] = new THREE.Vector3(68, 67, 54);
 campositions[2] = new THREE.Vector3(103, 93, -7);
+
+
+var textureLoader = new THREE.TextureLoader();
 
 
 //Variables for Raycaster
@@ -78,8 +83,8 @@ function init() {
 
     scene.add( camera ); // required, because we are adding a light as a child of the camera
 
-    var cube = new THREE.Mesh( new THREE.CubeGeometry(1,1,1), new THREE.MeshNormalMaterial() );
-    scene.add(cube);
+    // var cube = new THREE.Mesh( new THREE.CubeGeometry(1,1,1), new THREE.MeshNormalMaterial() );
+    // scene.add(cube);
 
 
 
@@ -108,7 +113,7 @@ function init() {
         var material = new THREE.MeshPhongMaterial( { color: 0xff5533 } );
         mesh = new THREE.Mesh( geometry, material );
         stl_1 = mesh.clone();
-        scene.add( mesh );
+        scene.add( stl_1 );
 
        }
       );
@@ -150,6 +155,11 @@ function init() {
 					scene.add( object );
 				}, onProgress, onError );
 
+        //JSON LOADER
+
+        loadLeePerrySmith();
+
+        //JSON LOADER
 
 
         //Code for Raycaster
@@ -158,9 +168,9 @@ function init() {
         geometry.vertices.push( new THREE.Vector3(), new THREE.Vector3() );
 
 
-        //controls = new THREE.TrackballControls( camera, canvas3D );
-      	//controls.minDistance = 50;
-      	//controls.maxDistance = 200;
+        controls = new THREE.TrackballControls( camera, canvas3D );
+      	controls.minDistance = 50;
+      	controls.maxDistance = 200;
 
         raycaster = new THREE.Raycaster()
 
@@ -173,9 +183,9 @@ function init() {
 
         window.addEventListener( 'resize', onWindowResize, false );
         var moved = false;
-        // controls.addEventListener( 'change', function() {
-        //   moved = true;
-        // } );
+        controls.addEventListener( 'change', function() {
+          moved = true;
+        } );
         window.addEventListener( 'mousedown', function () {
           moved = false;
         }, false );
@@ -203,9 +213,9 @@ function init() {
         }
 
         function checkIntersection() {
-          if ( ! mesh ) return;
+          if ( ! LeePerryMesh ) return;
           raycaster.setFromCamera( mouse, camera );
-          var intersects = raycaster.intersectObjects( [ mesh ] );
+          var intersects = raycaster.intersectObjects( [ LeePerryMesh ] );
           if ( intersects.length > 0 ) {
             var p = intersects[ 0 ].point;
             mouseHelper.position.copy( p );
@@ -258,7 +268,7 @@ function leftArrowKeyDown(event) {
       camera.lookAt(camlookatpoints[camcounter]);
       camera.position.x=campositions[camcounter].x;
       camera.position.y=campositions[camcounter].y;
-      camera.position.z=CAMERA_DISTANCE+ 10;
+      camera.position.z=campositions[camcounter].z;
 
 
       if (camcounter != numOfAnnotations -1) {
@@ -308,7 +318,25 @@ function shoot() {
 }
 
 
-
+function loadLeePerrySmith( callback ) {
+  var loader = new THREE.JSONLoader();
+  loader.load( '../models/leeperrysmith/LeePerrySmith.js', function( geometry ) {
+    var material = new THREE.MeshPhongMaterial( {
+      specular: 0x111111,
+      map: textureLoader.load( '../models/leeperrysmith/Map-COL.jpg' ),
+      specularMap: textureLoader.load( '../models/leeperrysmith/Map-SPEC.jpg' ),
+      normalMap: textureLoader.load( '../models/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
+      normalScale: new THREE.Vector2( 0.75, 0.75 ),
+      shininess: 25
+    } );
+    LeePerryMesh = new THREE.Mesh( geometry, material );
+    scene.add( LeePerryMesh );
+    LeePerryMesh.scale.set( 10, 10, 10 );
+    //scene.add( new THREE.FaceNormalsHelper( mesh, 1 ) );
+    //scene.add( new THREE.VertexNormalsHelper( mesh, 1 ) );
+    console.log('Loaded Perry Smith')
+  } );
+}
 
 
 function onWindowResize() {
@@ -325,7 +353,7 @@ function onWindowResize() {
 function animate() {
 
     requestAnimationFrame( animate );
-    //controls.update();
+    controls.update();
     render();
 
 }
