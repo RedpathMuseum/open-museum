@@ -7,18 +7,27 @@ var camcounter =0;
 var camPLcounter = 0;
 var numOfAnnotations = 3;
 
+
+var camlookat_start = new THREE.Vector3(0.018518396076858696, 0.08320761783954866,-0.9963601669693058);
+var camposition_start = new THREE.Vector3(-5.488823519163917, 4.861637666233516, 221.22000845737145);
+
 var camlookatpoints = [];
 // camlookatpoints[0] = new THREE.Vector3(119, 116, 293);
 camlookatpoints[0] = new THREE.Vector3(7, -12, -17);
-camlookatpoints[1] = new THREE.Vector3(75, 73, 57);
-camlookatpoints[2] = new THREE.Vector3(105, 95, 2);
+camlookatpoints[1] = new THREE.Vector3(14.486004686585296, 20.973093793771437, 0.260283392977336);
+//x: 14.486004686585296, y: 20.973093793771437, z: 0.260283392977336}
+//75, 73, 57
+camlookatpoints[2] = new THREE.Vector3(-1.7851443607485407, 21.50316117649372, 21.947977163593784);
+//x: -1.7851443607485407, y: 21.50316117649372, z: 21.947977163593784
 
 var campositions = [];
 //campositions[0] = new THREE.Vector3(119, 116, 303);
 campositions[0] = new THREE.Vector3(10, -6, -24);
-campositions[1] = new THREE.Vector3(68, 67, 54);
-campositions[2] = new THREE.Vector3(103, 93, -7);
-
+campositions[1] = new THREE.Vector3(24.227563973893602, 19.614504700896756, 2.0647939439520857);
+//24.227563973893602, y: 19.614504700896756, z: 2.0647939439520857
+//68, 67, 54
+campositions[2] = new THREE.Vector3(-1.0199619000466296,20.45148443807288, 31.86847483897232);
+//x: -1.0199619000466296, y: 20.45148443807288, z: 31.86847483897232
 
 var textureLoader = new THREE.TextureLoader();
 
@@ -243,6 +252,10 @@ function init() {
             camposalongnormal = line.geometry.vertices[ 1 ].copy( n );
             console.log("camposalongnormal");
             console.log(camposalongnormal);
+            console.log('camcurrentlook');
+            console.log(camera.getWorldDirection());
+            console.log('camcurrentposition');
+            console.log(camera.position);
 
           }
           else {
@@ -263,12 +276,16 @@ function leftArrowKeyDown(event) {
   var keyCode = event.keyCode;
   if(keyCode==37) {
     console.log("You hit the left arrow key.");
-    console.log(camlookatpoints[camcounter]);
+    // console.log(camlookatpoints[camcounter]);
     console.log(campositions[camcounter]);
-      camera.lookAt(camlookatpoints[camcounter]);
+    camera.lookAt(camlookatpoints[camcounter]);
       camera.position.x=campositions[camcounter].x;
       camera.position.y=campositions[camcounter].y;
       camera.position.z=campositions[camcounter].z;
+    console.log(camcounter);
+  //  controls.target = camlookatpoints[camcounter];
+
+
 
 
       if (camcounter != numOfAnnotations -1) {
@@ -278,6 +295,13 @@ function leftArrowKeyDown(event) {
         camcounter = 0;
       }
 
+    }
+    else if (keyCode ==39) {
+      camera.lookAt(camlookat_start);
+      camera.position.x = camposition_start.x;
+      camera.position.x = camposition_start.y;
+      camera.position.x = camposition_start.z;
+      console.log('Reset camera');
     }
     else {
     console.log("Oh no you didn't.");
