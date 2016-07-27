@@ -61,9 +61,23 @@ var check = new THREE.Vector3( 1, 1, 1 );
 //Variables for Raycaster
 
 
+//GUI Controls
+var cameraGUI = new function () {
+  this.message = 'cameraGUI';
+  this.explode = function() { ChangeCameraView(); };
+
+};
+
+var datGUI = new dat.GUI();
+datGUI.add(cameraGUI, 'message');
+datGUI.add(cameraGUI, 'explode');
+//GUI Controls
+
+
 
 init();
 animate();
+
 
 function init() {
 
@@ -306,6 +320,40 @@ function leftArrowKeyDown(event) {
     else {
     console.log("Oh no you didn't.");
     }
+}
+
+//Same function as leftArrowKeyDown, modified to satisfy datGUI with no error handling
+function ChangeCameraView() {
+
+    console.log("You hit the left arrow key.");
+    // console.log(camlookatpoints[camcounter]);
+    console.log(campositions[camcounter]);
+    camera.lookAt(camlookatpoints[camcounter]);
+    camera.position.x=campositions[camcounter].x;
+    camera.position.y=campositions[camcounter].y;
+    camera.position.z=campositions[camcounter].z;
+    console.log(camcounter);
+  //  controls.target = camlookatpoints[camcounter];
+
+
+
+
+    if (camcounter != numOfAnnotations -1) {
+      camcounter+= 1;
+    }
+    else {
+      camcounter = 0;
+    }
+}
+
+//Second part of leftArrowKeyDown function to reset camera, but satisfying datGUI    else if (keyCode ==39) {
+function ResetCamera() {
+
+      camera.lookAt(camlookat_start);
+      camera.position.x = camposition_start.x;
+      camera.position.x = camposition_start.y;
+      camera.position.x = camposition_start.z;
+      console.log('Reset camera');
 }
 
 
