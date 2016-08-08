@@ -7,6 +7,18 @@
 
     <title>Redpath museum</title>
 
+    <style>
+
+    #blocker {
+      position: absolute;
+      /* background-color: rgba(255, 0, 0, 0.5); */
+      top: 0px;
+      left: 0px;
+      width: 100%;
+      height: 100%;
+    }
+    </style>
+
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <!-- Place favicon.ico in the root directory -->
 
@@ -28,6 +40,10 @@
       <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
+    <!--Called by 3D web content when interactions occur-->
+    <div id="blocker"></div>
+
+    <div id="mydiv"><div/>
       <canvas id="canvas3D"></canvas>
 
     <div class="row marketing">
@@ -83,6 +99,7 @@
     <script src="scripts/main.js"></script>
     <script src="/scripts/STLLoader.js"></script>
     <script src="/scripts/OBJLoader.js"></script>
+    <script src="/scripts/CSS3DRenderer.js"></script>
     <script src="/scripts/render-window.js"></script>
     <!-- endbuild -->
   </body>
