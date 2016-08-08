@@ -1,11 +1,12 @@
-var container, camera, scene, renderer,LeePerryMesh, controls;
+var container, camera, scene, renderer, css3d_renderer, LeePerryMesh, controls, group;
 var WIDTH = 800;
 var LENGTH = 800;
 var CAMERA_DISTANCE = -20;
 
 var camcounter =0;
 var camPLcounter = 0;
-var numOfAnnotations = 3;
+var numOfAnnotations = 4;
+var annotcounter = 0;
 
 
 var camlookat_start = new THREE.Vector3(0.018518396076858696, 0.08320761783954866,-0.9963601669693058);
@@ -19,6 +20,7 @@ camlookatpoints[1] = new THREE.Vector3(14.486004686585296, 20.973093793771437, 0
 //75, 73, 57
 camlookatpoints[2] = new THREE.Vector3(-1.7851443607485407, 21.50316117649372, 21.947977163593784);
 //x: -1.7851443607485407, y: 21.50316117649372, z: 21.947977163593784
+camlookatpoints[3] = new THREE.Vector3(0,0,20);
 
 var campositions = [];
 //campositions[0] = new THREE.Vector3(119, 116, 303);
@@ -28,6 +30,7 @@ campositions[1] = new THREE.Vector3(24.227563973893602, 19.614504700896756, 2.06
 //68, 67, 54
 campositions[2] = new THREE.Vector3(-1.0199619000466296,20.45148443807288, 31.86847483897232);
 //x: -1.0199619000466296, y: 20.45148443807288, z: 31.86847483897232
+campositions[3] = new THREE.Vector3(0,0,20);
 
 var textureLoader = new THREE.TextureLoader();
 
@@ -74,6 +77,30 @@ datGUI.add(cameraGUI, 'explode');
 //GUI Controls
 
 
+//3D Web content initialization
+var Element = function ( id, x, y, z, ry ) {
+
+				var div = document.createElement( 'div' );
+				div.style.width = '480px';
+				div.style.height = '360px';
+				div.style.backgroundColor = '#000';
+
+				var iframe = document.createElement( 'iframe' );
+				iframe.style.width = '480px';
+				iframe.style.height = '360px';
+				iframe.style.border = '0px';
+				iframe.src = [ 'http://www.youtube.com/embed/', id, '?rel=0' ].join( '' );
+				div.appendChild( iframe );
+
+				var object = new THREE.CSS3DObject( div );
+				object.position.set( x, y, z );
+				object.rotation.y = ry;
+
+				return object;
+
+};
+//3D Web content initialization
+
 
 init();
 animate();
@@ -93,21 +120,50 @@ function init() {
     // //canvas3D.style.backgroundColor = #0000;
     // document.body.appendChild( canvas3D );
 
-    // renderer
-    renderer = new THREE.WebGLRenderer( {canvas: canvas3D} );
-    renderer.setSize( WIDTH,LENGTH );
-    renderer.setClearColor( 0xF2F2F2, 1);
-
     // scene
     scene = new THREE.Scene();
 
+    // renderer
+    renderer = new THREE.WebGLRenderer({canvas: canvas3D} );
+    renderer.setSize( WIDTH,LENGTH );
+    renderer.setClearColor( 0xF2F2F2, 1);
+
+    // CSS3D Renderer
+    css3d_renderer = new THREE.CSS3DRenderer( {canvas: canvas3D} );
+		css3d_renderer.setSize( window.innerWidth, window.innerHeight);
+		css3d_renderer.domElement.style.position = 'absolute';
+		css3d_renderer.domElement.style.top = 0;
+    canvas3D.appendChild( css3d_renderer.domElement );
+    // CSS3D Renderer
+
+
+
+
     // camera
-    camera = new THREE.PerspectiveCamera( 35, WIDTH / LENGTH, 1, 10000 );
+    camera = new THREE.PerspectiveCamera( 50, window.innerWidth/window.innerHeight, 1, 5000 );
+    camera.position.set(500, 350, 750);
 
     scene.add( camera ); // required, because we are adding a light as a child of the camera
 
     // var cube = new THREE.Mesh( new THREE.CubeGeometry(1,1,1), new THREE.MeshNormalMaterial() );
     // scene.add(cube);
+
+    //3D Web content
+    group = new THREE.Group();
+		group.add( new Element( 'njCDZWTI-xg', 0, 0, 240, 0 ) );
+		group.add( new Element( 'HDh4uK9PvJU', 240, 0, 0, Math.PI / 2 ) );
+		group.add( new Element( 'OX9I1KyNa8M', 0, 0, - 240, Math.PI ) );
+		group.add( new Element( 'nhORZ6Ep_jE', - 240, 0, 0, - Math.PI / 2 ) );
+		scene.add( group );
+    console.log('added group')
+    console.log(group);
+
+    var blocker = document.getElementById( 'blocker' );
+		blocker.style.display = 'none';
+
+		document.addEventListener( 'mousedown', function () { blocker.style.display = ''; } );
+		document.addEventListener( 'mouseup', function () { blocker.style.display = 'none'; } );
+    //3D Web content
 
 
 
@@ -180,7 +236,7 @@ function init() {
 
         //JSON LOADER
 
-        loadLeePerrySmith();
+        //loadLeePerrySmith();
 
         //JSON LOADER
 
@@ -230,9 +286,17 @@ function init() {
             x = event.clientX;
             y = event.clientY;
           }
+
+          console.log('This is mouse x real '+event.clientX);
+          console.log('This is mouse y real '+event.clientY);
+
           mouse.x = ( x / window.innerWidth ) * 2 - 1;
           mouse.y = - ( y / window.innerHeight ) * 2 + 1;
-          checkIntersection();
+
+
+          console.log('This is mouse x relative '+mouse.x);
+          console.log('This is mouse y relative '+mouse.y);
+          checkIntersection(mouse.y);
         }
 
         function checkIntersection() {
@@ -325,13 +389,15 @@ function leftArrowKeyDown(event) {
 //Same function as leftArrowKeyDown, modified to satisfy datGUI with no error handling
 function ChangeCameraView() {
 
-    console.log("You hit the left arrow key.");
+    console.log("Changed Camera View");
+    console.log(group.position);
     // console.log(camlookatpoints[camcounter]);
     console.log(campositions[camcounter]);
     camera.lookAt(camlookatpoints[camcounter]);
     camera.position.x=campositions[camcounter].x;
     camera.position.y=campositions[camcounter].y;
     camera.position.z=campositions[camcounter].z;
+    console.log('cam counter');
     console.log(camcounter);
   //  controls.target = camlookatpoints[camcounter];
 
@@ -344,6 +410,33 @@ function ChangeCameraView() {
     else {
       camcounter = 0;
     }
+    var mydiv = document.getElementById('mydiv');
+    console.log(mydiv);
+    var newdiv = document.createElement("div");
+    //var tooltip = '<div class="tooltip"><p>This is a tooltip. It is typically used to explain something to a user without taking up space on the page.</p></div>'
+      newdiv.innerHTML = "<p>This is a tooltip. It is typically used to explain something to a user without taking up space on the page.</p>"
+      newdiv.setAttribute("class", "bubble");
+      mydiv.appendChild(newdiv);
+      console.log('Im fine');
+
+      //Change annotation
+      var color = window.getComputedStyle(
+        document.querySelector('.bubble'), ':after'
+      ).getPropertyValue('left');
+      console.log(color);
+      color = "30px";
+
+      console.log(color);
+
+      console.log(annotcounter);
+
+      var list = document.getElementsByClassName("bubble")[annotcounter];
+      list.style.top = "10px";
+      list.style.left = "1px";
+        annotcounter+= 1;
+      //ChangeAnnotation
+
+
 }
 
 //Second part of leftArrowKeyDown function to reset camera, but satisfying datGUI    else if (keyCode ==39) {
@@ -434,6 +527,7 @@ function render() {
 
     //camera.lookAt( scene.position );
     renderer.render( scene, camera );
+  // css3d_renderer.render ( scene, camera);
 
     var intersects = raycaster.intersectObjects(scene.children);
     //console.log(intersects);
