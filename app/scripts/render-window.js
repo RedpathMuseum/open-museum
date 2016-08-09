@@ -8,6 +8,9 @@ var camPLcounter = 0;
 var numOfAnnotations = 4;
 var annotcounter = 0;
 
+var AkeyIsDown;
+
+
 
 var camlookat_start = new THREE.Vector3(0.018518396076858696, 0.08320761783954866,-0.9963601669693058);
 var camposition_start = new THREE.Vector3(-5.488823519163917, 4.861637666233516, 221.22000845737145);
@@ -31,6 +34,12 @@ campositions[1] = new THREE.Vector3(24.227563973893602, 19.614504700896756, 2.06
 campositions[2] = new THREE.Vector3(-1.0199619000466296,20.45148443807288, 31.86847483897232);
 //x: -1.0199619000466296, y: 20.45148443807288, z: 31.86847483897232
 campositions[3] = new THREE.Vector3(0,0,20);
+
+//Configuration variables set in edit mode
+var AnnotSpheres = [];
+var AnnotCamPos = [];
+var AnnotCamLookatPts = [];
+//Configuration variables set in edit mode
 
 var textureLoader = new THREE.TextureLoader();
 
@@ -63,17 +72,36 @@ var check = new THREE.Vector3( 1, 1, 1 );
 
 //Variables for Raycaster
 
+//Variables for annotation sphere
+var SphereGeometry = new THREE.SphereGeometry( 5, 32, 32 );
+var SphereMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+var Sphere = new THREE.Mesh( SphereGeometry, SphereMaterial );
+
+//Variables for annotation sphere
+
 
 //GUI Controls
 var cameraGUI = new function () {
   this.message = 'cameraGUI';
   this.explode = function() { ChangeCameraView(); };
+  this.EditMode  = true;
 
 };
 
 var datGUI = new dat.GUI();
 datGUI.add(cameraGUI, 'message');
 datGUI.add(cameraGUI, 'explode');
+datGUI.add(cameraGUI, 'EditMode').onChange(function(newValue){
+  console.log("Value changed to:  ", newValue);
+  ChangeEditMode(newValue);
+
+});
+
+var InEditMode = true;
+function ChangeEditMode(newValue){
+  InEditMode = newValue;
+  console.log("InEditMode changed to: ", InEditMode);
+}
 //GUI Controls
 
 
@@ -147,6 +175,10 @@ function init() {
 
     // var cube = new THREE.Mesh( new THREE.CubeGeometry(1,1,1), new THREE.MeshNormalMaterial() );
     // scene.add(cube);
+
+    //Add annotation sphere
+    scene.add( Sphere );
+    Sphere.visible = false;
 
     //3D Web content
     group = new THREE.Group();
@@ -236,7 +268,7 @@ function init() {
 
         //JSON LOADER
 
-        //loadLeePerrySmith();
+        loadLeePerrySmith();
 
         //JSON LOADER
 
@@ -270,12 +302,13 @@ function init() {
         }, false );
         window.addEventListener( 'mouseup', function() {
           checkIntersection();
-          if ( ! moved ) shoot();
+          // if ( ! moved ) shoot();
         } );
         window.addEventListener( 'mousemove', onTouchMove );
         window.addEventListener( 'touchmove', onTouchMove );
 
         window.addEventListener("keydown", leftArrowKeyDown, false);
+        window.addEventListener("keydown", AkeyDown, false);
 
 
         function onTouchMove( event ) {
@@ -300,7 +333,7 @@ function init() {
         }
 
         function checkIntersection() {
-          if ( ! LeePerryMesh ) return;
+          // if ( ! LeePerryMesh ) return;
           raycaster.setFromCamera( mouse, camera );
           var intersects = raycaster.intersectObjects( [ LeePerryMesh ] );
           if ( intersects.length > 0 ) {
@@ -335,11 +368,26 @@ function init() {
             console.log('camcurrentposition');
             console.log(camera.position);
 
+            if(InEditMode == true){
+              Sphere.position.copy(camlookatpoint);
+              Sphere.visible = true;
+              if(AkeyIsDown==true){
+                console.log("CAAAALLLLING FREEZZZZZEEEEE");
+                FreezeSphere(camlookatpoint, camposalongnormal);
+              }
+            }
+            else{
+              Sphere.visible= false;
+            }
+
           }
           else {
             intersection.intersects = false;
+            Sphere.visible = false;
           }
       }
+
+
 
 
 
@@ -374,16 +422,16 @@ function leftArrowKeyDown(event) {
       }
 
     }
-    else if (keyCode ==39) {
+    else if(keyCode ==39) {  
       camera.lookAt(camlookat_start);
       camera.position.x = camposition_start.x;
       camera.position.x = camposition_start.y;
       camera.position.x = camposition_start.z;
       console.log('Reset camera');
     }
-    else {
-    console.log("Oh no you didn't.");
-    }
+    // else {
+    // console.log("Oh no you didn't.");
+    // }
 }
 
 //Same function as leftArrowKeyDown, modified to satisfy datGUI with no error handling
@@ -410,12 +458,18 @@ function ChangeCameraView() {
     else {
       camcounter = 0;
     }
+    if(annotcounter != 0){
+      var element = document.getElementById("newdiv");
+      element.parentNode.removeChild(element);
+      console.log('remove');
+    }
     var mydiv = document.getElementById('mydiv');
     console.log(mydiv);
     var newdiv = document.createElement("div");
     //var tooltip = '<div class="tooltip"><p>This is a tooltip. It is typically used to explain something to a user without taking up space on the page.</p></div>'
       newdiv.innerHTML = "<p>This is a tooltip. It is typically used to explain something to a user without taking up space on the page.</p>"
       newdiv.setAttribute("class", "bubble");
+      newdiv.setAttribute("id", "newdiv");
       mydiv.appendChild(newdiv);
       console.log('Im fine');
 
@@ -430,10 +484,11 @@ function ChangeCameraView() {
 
       console.log(annotcounter);
 
-      var list = document.getElementsByClassName("bubble")[annotcounter];
+      var list = document.getElementsByClassName("bubble")[0];
       list.style.top = "10px";
       list.style.left = "1px";
         annotcounter+= 1;
+
       //ChangeAnnotation
 
 
@@ -449,10 +504,35 @@ function ResetCamera() {
       console.log('Reset camera');
 }
 
+function AkeyDown(event){
+  AkeyIsDown = false;
+  var keyCode = event.keyCode;
+  console.log(keyCode);
+  if(keyCode==65){
+    AkeyIsDown = true;
+  }
+  else{
 
-function shoot() {
+  }
+  console.log("AkeyIsDOOOOOOWWWNN", AkeyIsDown);
 
-  console.log('shooting');
+}
+
+function FreezeSphere(camlookatpoint, camposalongnormal) {
+
+
+
+  console.log('FreezingSphere');
+  var dummySphereGeo = new THREE.SphereGeometry( 5, 32, 32 );
+  var dummyMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+  var dummySphere = new THREE.Mesh( dummySphereGeo, dummyMaterial );
+  dummySphere.position.copy(camlookatpoint);
+  scene.add(dummySphere);
+
+  AnnotSpheres.push(dummySphere);
+  AnnotCamPos.push(camposalongnormal);
+  AnnotCamLookatPts.push(dummySphere.position);
+
   // var camlookatpoints = {
   //   look1: new THREE.Vector3(119, 116, 293),
   //   look2: new THREE.Vector3(75, 73, 57),
