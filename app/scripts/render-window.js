@@ -77,6 +77,7 @@ var SphereGeometry = new THREE.SphereGeometry( 5, 32, 32 );
 var SphereMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00} );
 var Sphere = new THREE.Mesh( SphereGeometry, SphereMaterial );
 
+var CurrSphereData = [];
 //Variables for annotation sphere
 
 
@@ -302,8 +303,10 @@ function init() {
         }, false );
         window.addEventListener( 'mouseup', function() {
           checkIntersection();
-          // if ( ! moved ) shoot();
-        } );
+          // if ( ! moved ){
+          //   FreezeSphere(CurrSphereData[0], CurrSphereData[1]);
+          // }
+        });
         window.addEventListener( 'mousemove', onTouchMove );
         window.addEventListener( 'touchmove', onTouchMove );
 
@@ -367,14 +370,15 @@ function init() {
             console.log(camera.getWorldDirection());
             console.log('camcurrentposition');
             console.log(camera.position);
-
+            CurrSphereData[0] = camlookatpoint;
+            CurrSphereData[1] = camposalongnormal;
             if(InEditMode == true){
               Sphere.position.copy(camlookatpoint);
               Sphere.visible = true;
-              if(AkeyIsDown==true){
-                console.log("CAAAALLLLING FREEZZZZZEEEEE");
-                FreezeSphere(camlookatpoint, camposalongnormal);
-              }
+              // if(AkeyIsDown==true){
+              //   console.log("CAAAALLLLING FREEZZZZZEEEEE");
+                // FreezeSphere(camlookatpoint, camposalongnormal);
+              // }
             }
             else{
               Sphere.visible= false;
@@ -422,7 +426,7 @@ function leftArrowKeyDown(event) {
       }
 
     }
-    else if(keyCode ==39) {  
+    else if(keyCode ==39) {
       camera.lookAt(camlookat_start);
       camera.position.x = camposition_start.x;
       camera.position.x = camposition_start.y;
@@ -505,13 +509,16 @@ function ResetCamera() {
 }
 
 function AkeyDown(event){
-  AkeyIsDown = false;
   var keyCode = event.keyCode;
   console.log(keyCode);
   if(keyCode==65){
     AkeyIsDown = true;
+    console.log("AkeyDownCheckIntersection", AkeyIsDown);
+    FreezeSphere(CurrSphereData[0], CurrSphereData[1]);
+    AkeyIsDown = false;a
   }
   else{
+    AkeyIsDown = false;
 
   }
   console.log("AkeyIsDOOOOOOWWWNN", AkeyIsDown);
