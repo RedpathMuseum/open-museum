@@ -82,10 +82,12 @@ var CurrSphereData = [];
 
 
 //GUI Controls
+var camcounter_gui = 0;
 var cameraGUI = new function () {
   this.message = 'cameraGUI';
   this.explode = function() { ChangeCameraView(); };
   this.EditMode  = true;
+  this.SelectSphere = 0;
 
 };
 
@@ -95,6 +97,15 @@ datGUI.add(cameraGUI, 'explode');
 datGUI.add(cameraGUI, 'EditMode').onChange(function(newValue){
   console.log("Value changed to:  ", newValue);
   ChangeEditMode(newValue);
+
+});
+datGUI.add(cameraGUI, 'SelectSphere').onChange(function(newValue){
+  console.log("cameraGUI.SelectSphere = ", cameraGUI.SelectSphere );
+  camcounter_gui =  newValue;
+  console.log("camcounter_gui = ", camcounter_gui);
+
+
+
 
 });
 
@@ -301,6 +312,9 @@ function init() {
         window.addEventListener( 'mousedown', function () {
           moved = false;
         }, false );
+
+        window.addEventListener("keydown", AkeyDown, false);
+
         window.addEventListener( 'mouseup', function() {
           checkIntersection();
           // if ( ! moved ){
@@ -311,7 +325,7 @@ function init() {
         window.addEventListener( 'touchmove', onTouchMove );
 
         window.addEventListener("keydown", leftArrowKeyDown, false);
-        window.addEventListener("keydown", AkeyDown, false);
+
 
 
         function onTouchMove( event ) {
@@ -433,6 +447,16 @@ function leftArrowKeyDown(event) {
       camera.position.x = camposition_start.z;
       console.log('Reset camera');
     }
+
+    else if(keyCode ==38) {
+      console.log("keycode 38 pressed up arrow, camera_gui= ", camcounter_gui);
+      console.log("AnnotCamLookatPts[camcounter_gui] =" , AnnotCamLookatPts[camcounter_gui]);
+      console.log("  camera.position.x=AnnotCamPos[camcounter_gui];",   AnnotCamPos[camcounter_gui]);
+      camera.lookAt(AnnotCamLookatPts[camcounter_gui]);
+      camera.position.x=AnnotCamPos[camcounter_gui].x;
+      camera.position.y=AnnotCamPos[camcounter_gui].y;
+      camera.position.z=AnnotCamPos[camcounter_gui].z;
+    }
     // else {
     // console.log("Oh no you didn't.");
     // }
@@ -442,7 +466,7 @@ function leftArrowKeyDown(event) {
 function ChangeCameraView() {
 
     console.log("Changed Camera View");
-    console.log(group.position);
+    console.log("Group.position = ",group.position);
     // console.log(camlookatpoints[camcounter]);
     console.log(campositions[camcounter]);
     camera.lookAt(camlookatpoints[camcounter]);
@@ -515,7 +539,8 @@ function AkeyDown(event){
     AkeyIsDown = true;
     console.log("AkeyDownCheckIntersection", AkeyIsDown);
     FreezeSphere(CurrSphereData[0], CurrSphereData[1]);
-    AkeyIsDown = false;a
+    AkeyIsDown = false;
+    console.log("Freeze Sphere fctn camcounter = ", camcounter);
   }
   else{
     AkeyIsDown = false;
@@ -534,11 +559,21 @@ function FreezeSphere(camlookatpoint, camposalongnormal) {
   var dummyMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00} );
   var dummySphere = new THREE.Mesh( dummySphereGeo, dummyMaterial );
   dummySphere.position.copy(camlookatpoint);
+
+  var dummycamposnormal = new THREE.Vector3();
+  dummycamposnormal.copy(camposalongnormal);
   scene.add(dummySphere);
 
   AnnotSpheres.push(dummySphere);
-  AnnotCamPos.push(camposalongnormal);
+  AnnotCamPos.push(dummycamposnormal);
   AnnotCamLookatPts.push(dummySphere.position);
+
+  camera.lookAt(AnnotCamLookatPts[camcounter]);
+  camera.position.x=AnnotCamPos[camcounter].x;
+  camera.position.y=AnnotCamPos[camcounter].y;
+  camera.position.z=AnnotCamPos[camcounter].z;
+  camcounter += 1;
+
 
   // var camlookatpoints = {
   //   look1: new THREE.Vector3(119, 116, 293),
