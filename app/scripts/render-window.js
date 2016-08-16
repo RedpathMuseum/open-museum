@@ -417,6 +417,7 @@ function init() {
 
 
 function leftArrowKeyDown(event) {
+
   var keyCode = event.keyCode;
   if(keyCode==37) {
     console.log("You hit the left arrow key.");
@@ -533,17 +534,29 @@ function ResetCamera() {
 }
 
 function AkeyDown(event){
+  AkeyIsDown = true;
   var keyCode = event.keyCode;
   console.log(keyCode);
   if(keyCode==65){
     AkeyIsDown = true;
     console.log("AkeyDownCheckIntersection", AkeyIsDown);
     FreezeSphere(CurrSphereData[0], CurrSphereData[1]);
-    AkeyIsDown = false;
+
     console.log("Freeze Sphere fctn camcounter = ", camcounter);
   }
-  else{
-    AkeyIsDown = false;
+  else if (keyCode==83 && AkeyIsDown==true){
+    console.log("INSIDE 83--------");
+    console.log("camcounter at CamPosEdit", camcounter);
+    var CurrCamPos = new THREE.Vector3();
+    // console.log("camera.position = ", camera.position)
+    CurrCamPos.set(camera.position.x, camera.position.y, camera.position.z);
+    console.log("CurrCamPos = ", CurrCamPos);
+    AnnotCamPos.push(CurrCamPos);
+
+    console.log("AnnotCamPos=  ", AnnotCamPos[camcounter -1]);
+    // camera.position.x=AnnotCamPos[camcounter].x;
+    // camera.position.y=AnnotCamPos[camcounter].y;
+    // camera.position.z=AnnotCamPos[camcounter].z;
 
   }
   console.log("AkeyIsDOOOOOOWWWNN", AkeyIsDown);
@@ -565,14 +578,18 @@ function FreezeSphere(camlookatpoint, camposalongnormal) {
   scene.add(dummySphere);
 
   AnnotSpheres.push(dummySphere);
-  AnnotCamPos.push(dummycamposnormal);
+  // AnnotCamPos.push(dummycamposnormal);
   AnnotCamLookatPts.push(dummySphere.position);
-
+  // console.log("AnnotCamPos = ", AnnotCamPos[camcounter]);
   camera.lookAt(AnnotCamLookatPts[camcounter]);
-  camera.position.x=AnnotCamPos[camcounter].x;
-  camera.position.y=AnnotCamPos[camcounter].y;
-  camera.position.z=AnnotCamPos[camcounter].z;
+  // camera.position.x=AnnotCamPos[camcounter].x;
+  // camera.position.y=AnnotCamPos[camcounter].y;
+  // camera.position.z=AnnotCamPos[camcounter].z;
+  camera.position.x=dummycamposnormal.x;
+  camera.position.y=dummycamposnormal.y;
+  camera.position.z=dummycamposnormal.z;
   camcounter += 1;
+  console.log("CurrentCamPos object", camera.position.x);
 
 
   // var camlookatpoints = {
