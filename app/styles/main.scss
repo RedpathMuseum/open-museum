@@ -141,6 +141,7 @@ div.bubble p {
   p + h4 {
     margin-top: 28px;
   }
+  margin-right: 10px;
 }
 
 /* Responsive: Portrait tablets and up */
@@ -172,4 +173,10 @@ div.bubble p {
     body {
         padding-top: 20px;
     }
+}
+
+.subtitle {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid black;
 }
