@@ -6,7 +6,8 @@
     "modernizr": "~2.8.1",
     "three.js": "threejs#*",
     "threejs-trackball-controls": "*",
-    "THREEOrbitControls": "^71.1.0"
+    "THREEOrbitControls": "^71.1.0",
+    "dat-gui": "^0.5.1"
   },
   "overrides": {
     "bootstrap-sass": {
