@@ -1,6 +1,7 @@
 var container, camera, scene, renderer, css3d_renderer, LeePerryMesh, controls, group;
-var WIDTH = 800;
-var LENGTH = 800;
+/*var WIDTH = 3/4 * screen.width;*/
+var WIDTH = screen.width * .75;
+var LENGTH = screen.height * .75;
 var CAMERA_DISTANCE = -20;
 
 var camcounter =0;
