@@ -50,7 +50,8 @@ var y;
 var raycaster;
 var mesh;
 var stl_1 = new THREE.Mesh();
-var cube;
+// var cube;
+var cameraTarget = new THREE.Mesh( new THREE.CubeGeometry(0,0,0));
 var line;
 var mouseHelper;
 var mouse = new THREE.Vector2();
@@ -453,10 +454,20 @@ function leftArrowKeyDown(event) {
       console.log("keycode 38 pressed up arrow, camera_gui= ", camcounter_gui);
       console.log("AnnotCamLookatPts[camcounter_gui] =" , AnnotCamLookatPts[camcounter_gui]);
       console.log("  camera.position.x=AnnotCamPos[camcounter_gui];",   AnnotCamPos[camcounter_gui]);
-      camera.lookAt(AnnotCamLookatPts[camcounter_gui]);
       camera.position.x=AnnotCamPos[camcounter_gui].x;
       camera.position.y=AnnotCamPos[camcounter_gui].y;
       camera.position.z=AnnotCamPos[camcounter_gui].z;
+
+      console.log("camera.up=",camera.up);
+      // camera.lookAt(AnnotCamLookatPts[camcounter_gui]);
+      controls.target=AnnotCamLookatPts[camcounter_gui];
+      camera.up = new THREE.Vector3(0,1,0);
+
+
+      // cameraTarget.position.x=AnnotCamLookatPts[camcounter_gui].x;
+      // cameraTarget.position.y=AnnotCamLookatPts[camcounter_gui].y;
+      // cameraTarget.position.z=AnnotCamLookatPts[camcounter_gui].z;
+
     }
     // else {
     // console.log("Oh no you didn't.");
@@ -470,7 +481,8 @@ function ChangeCameraView() {
     console.log("Group.position = ",group.position);
     // console.log(camlookatpoints[camcounter]);
     console.log(campositions[camcounter]);
-    camera.lookAt(camlookatpoints[camcounter]);
+    // camera.lookAt(camlookatpoints[camcounter]);
+    // controls.target(camlookatpoints[camcounter]);
     camera.position.x=campositions[camcounter].x;
     camera.position.y=campositions[camcounter].y;
     camera.position.z=campositions[camcounter].z;
@@ -581,7 +593,12 @@ function FreezeSphere(camlookatpoint, camposalongnormal) {
   // AnnotCamPos.push(dummycamposnormal);
   AnnotCamLookatPts.push(dummySphere.position);
   // console.log("AnnotCamPos = ", AnnotCamPos[camcounter]);
-  camera.lookAt(AnnotCamLookatPts[camcounter]);
+  // camera.lookAt(AnnotCamLookatPts[camcounter]);
+
+  console.log("camera.up=",camera.up);
+  controls.target=AnnotCamLookatPts[camcounter];
+  camera.up = new THREE.Vector3(0,1,0);
+
   // camera.position.x=AnnotCamPos[camcounter].x;
   // camera.position.y=AnnotCamPos[camcounter].y;
   // camera.position.z=AnnotCamPos[camcounter].z;
@@ -590,6 +607,7 @@ function FreezeSphere(camlookatpoint, camposalongnormal) {
   camera.position.z=dummycamposnormal.z;
   camcounter += 1;
   console.log("CurrentCamPos object", camera.position.x);
+
 
 
   // var camlookatpoints = {
@@ -664,7 +682,7 @@ function animate() {
 
 function render() {
 
-    //camera.lookAt( scene.position );
+    // camera.lookAt(cameraTarget.position);
     renderer.render( scene, camera );
   // css3d_renderer.render ( scene, camera);
 
