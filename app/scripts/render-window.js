@@ -1,7 +1,11 @@
 var container, camera, scene, renderer, css3d_renderer, LeePerryMesh, controls, group;
 /*var WIDTH = 3/4 * screen.width;*/
+var LENGTH = screen.height;
 var WIDTH = screen.width * .75;
-var LENGTH = screen.height * .75;
+if (screen.width <= 960) {
+    WIDTH = screen.width * .50;
+}
+
 var CAMERA_DISTANCE = -20;
 
 var camcounter =0;
@@ -834,7 +838,7 @@ function onWindowResize() {
 
       camera.updateProjectionMatrix();
 
-      renderer.setSize( window.innerWidth, window.innerHeight );
+      //renderer.setSize( window.innerWidth, window.innerHeight );
 
 }
 
