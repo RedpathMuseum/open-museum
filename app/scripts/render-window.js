@@ -12,6 +12,11 @@ var tour_counter=0;
 
 var AkeyIsDown;
 
+//JSON Loader's variables for files paths
+var object_to_load_obj_path = '../models/Homo_Erectus/Low_180.json';
+var object_to_load_colormap_path = '../models/Homo_Erectus/ALBEDO1k.jpg';
+var object_to_load_specmap_path = '../models/Homo_Erectus/SPEC1K.jpg';
+var object_to_load_normalmap_path = '../models/Homo_Erectus/NORMAL1K.jpg';
 
 
 var camlookat_start = new THREE.Vector3(0.018518396076858696, 0.08320761783954866,-0.9963601669693058);
@@ -302,11 +307,8 @@ function init() {
 					scene.add( object );
 				}, onProgress, onError );
 
-        //JSON LOADER
-
-        loadLeePerrySmith();
-
-        //JSON LOADER
+        //Load JSON 3D object
+        loadJSON();
 
 
         //Code for Raycaster
@@ -803,14 +805,15 @@ function loadLeePerrySmith( callback ) {
   } );
 }
 
-function loadLeePerrySmith( callback ) {
+//JSON Loader
+function loadJSON( callback ) {
   var loader = new THREE.JSONLoader();
-  loader.load( '../models/Homo_Erectus/Low_180.json', function( geometry ) {
+  loader.load( object_to_load_obj_path, function( geometry ) {
     var material = new THREE.MeshPhongMaterial( {
       specular: 0x111111,
-      map: textureLoader.load( '../models/Homo_Erectus/ALBEDO1k.jpg' ),
-      specularMap: textureLoader.load( '../models/Homo_Erectus/SPEC1K.jpg' ),
-      normalMap: textureLoader.load( '../models/Homo_Erectus/NORMAL1K.jpg' ),
+      map: textureLoader.load( object_to_load_colormap_path ),
+      specularMap: textureLoader.load( object_to_load_specmap_path ),
+      normalMap: textureLoader.load( object_to_load_normalmap_path),
       normalScale: new THREE.Vector2( 0.75, 0.75 ),
       shininess: 25
     } );
@@ -822,7 +825,7 @@ function loadLeePerrySmith( callback ) {
     console.log('Loaded Perry Smith')
   } );
 }
-
+//JSON Loader
 
 function onWindowResize() {
 
