@@ -87,6 +87,7 @@ var camcounter_gui = 0;
 var cameraGUI = new function () {
   this.message = 'cameraGUI';
   this.explode = function() { ChangeCameraView(); };
+  this.playtour = function() { PlayTour(); };
   this.EditMode  = true;
   this.SelectSphere = 0;
 
@@ -104,6 +105,9 @@ datGUI.add(cameraGUI, 'SelectSphere').onChange(function(newValue){
   console.log("cameraGUI.SelectSphere = ", cameraGUI.SelectSphere );
   camcounter_gui =  newValue;
   console.log("camcounter_gui = ", camcounter_gui);
+
+
+datGUI.add(cameraGUI, 'playtour');
 
 
 
@@ -639,6 +643,11 @@ function FreezeSphere(camlookatpoint, camposalongnormal) {
   //console.log(camcounter);
 }
 
+function PlayTour(){
+
+  
+}
+
 
 function loadLeePerrySmith( callback ) {
   var loader = new THREE.JSONLoader();
@@ -660,25 +669,25 @@ function loadLeePerrySmith( callback ) {
   } );
 }
 
-function loadLeePerrySmith( callback ) {
-  var loader = new THREE.JSONLoader();
-  loader.load( '../models/Homo_Erectus/Low.json', function( geometry ) {
-    var material = new THREE.MeshPhongMaterial( {
-      specular: 0x111111,
-      map: textureLoader.load( '../models/Homo_Erectus/ALBEDO1k.jpg' ),
-      specularMap: textureLoader.load( '../models/Homo_Erectus/SPEC1K.jpg' ),
-      normalMap: textureLoader.load( '../models/Homo_Erectus/NORMAL1K.jpg' ),
-      normalScale: new THREE.Vector2( 0.75, 0.75 ),
-      shininess: 25
-    } );
-    LeePerryMesh = new THREE.Mesh( geometry, material );
-    scene.add( LeePerryMesh );
-    LeePerryMesh.scale.set( 10, 10, 10 );
-    //scene.add( new THREE.FaceNormalsHelper( mesh, 1 ) );
-    //scene.add( new THREE.VertexNormalsHelper( mesh, 1 ) );
-    console.log('Loaded Perry Smith')
-  } );
-}
+// function loadLeePerrySmith( callback ) {
+//   var loader = new THREE.JSONLoader();
+//   loader.load( '../models/Homo_Erectus/Low.json', function( geometry ) {
+//     var material = new THREE.MeshPhongMaterial( {
+//       specular: 0x111111,
+//       map: textureLoader.load( '../models/Homo_Erectus/ALBEDO1k.jpg' ),
+//       specularMap: textureLoader.load( '../models/Homo_Erectus/SPEC1K.jpg' ),
+//       normalMap: textureLoader.load( '../models/Homo_Erectus/NORMAL1K.jpg' ),
+//       normalScale: new THREE.Vector2( 0.75, 0.75 ),
+//       shininess: 25
+//     } );
+//     LeePerryMesh = new THREE.Mesh( geometry, material );
+//     scene.add( LeePerryMesh );
+//     LeePerryMesh.scale.set( 10, 10, 10 );
+//     //scene.add( new THREE.FaceNormalsHelper( mesh, 1 ) );
+//     //scene.add( new THREE.VertexNormalsHelper( mesh, 1 ) );
+//     console.log('Loaded Perry Smith')
+//   } );
+// }
 
 
 function onWindowResize() {
