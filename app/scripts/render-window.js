@@ -261,18 +261,19 @@ function init() {
     // camera.position.y=mesh.position.y;
     // camera.position.z=CAMERA_DISTANCE;
 
-  //Loading a .stl file
-    var loader = new THREE.STLLoader();
+    // TODO Remove dead code block
+    //Loading a .stl file
+    //var loader = new THREE.STLLoader();
 
-    loader.load( '../models/kaplan.STL', function ( geometry ) {
+    //loader.load( '../models/kaplan.STL', function ( geometry ) {
 
-        var material = new THREE.MeshPhongMaterial( { color: 0xff5533 } );
-        mesh = new THREE.Mesh( geometry, material );
-        stl_1 = mesh.clone();
-        scene.add( stl_1 );
+    //    var material = new THREE.MeshPhongMaterial( { color: 0xff5533 } );
+    //    mesh = new THREE.Mesh( geometry, material );
+    //    stl_1 = mesh.clone();
+    //    scene.add( stl_1 );
 
-       }
-      );
+    //   }
+    //  );
 
       // camera.lookAt(stl_1.position)
       // camera.position.x=stl_1.position.x - 40;
@@ -297,19 +298,20 @@ function init() {
 				var onError = function ( xhr ) {
 				};
 
-      var manager = new THREE.LoadingManager();
-      // model
-				var loader = new THREE.OBJLoader( manager );
-				loader.load( '../models/Trott_life_tentacules_with_colors_smooth_E_texture.obj', function ( object ) {
-
-          object.traverse( function ( child ) {
-						if ( child instanceof THREE.Mesh ) {
-							child.material.map = texture;
-						}
-					} );
-					object.position.y = - 95;
-					scene.add( object );
-				}, onProgress, onError );
+    // TODO: Remove dead code block
+//      var manager = new THREE.LoadingManager();
+//      // model
+//				var loader = new THREE.OBJLoader( manager );
+//				loader.load( '../models/Trott_life_tentacules_with_colors_smooth_E_texture.obj', function ( object ) {
+//
+//          object.traverse( function ( child ) {
+//						if ( child instanceof THREE.Mesh ) {
+//							child.material.map = texture;
+//						}
+//					} );
+//					object.position.y = - 95;
+//					scene.add( object );
+//				}, onProgress, onError );
 
         //Load JSON 3D object
         loadJSON();
