@@ -8,6 +8,7 @@ var camcounter =0;
 var camPLcounter = 0;
 var numOfAnnotations = 4;
 var annotcounter = 0;
+var tour_counter=0;
 
 var AkeyIsDown;
 
@@ -80,25 +81,43 @@ var SphereMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00} );
 var Sphere = new THREE.Mesh( SphereGeometry, SphereMaterial );
 
 var CurrSphereData = [];
-//Variables for annotation sphere
 
+var tooltiptext = [];
+var pTagArray = [];
+//Variables for annotation sphere
 
 //GUI Controls
 var camcounter_gui = 0;
 var cameraGUI = new function () {
   this.message = 'cameraGUI';
   this.explode = function() { ChangeCameraView(); };
-  this.EditMode  = true;
+  this.playtour = function() { PlayTour(); };
+  this.nextview = function() { NextView(); };
+  this.previousview = function() { PreviousView(); };
+  this.changeorder = function() { ChangeAnnotOrder(); };
+  this.EditMode  = false;
   this.SelectSphere = 0;
+  this.Annot = new Array();
+  this.Tips = new Array();
+
 
 };
 
+cameraGUI.annotcampos = 0;
+
+var ViewMenu;
+
 var datGUI = new dat.GUI();
+
 datGUI.add(cameraGUI, 'message');
 datGUI.add(cameraGUI, 'explode');
 datGUI.add(cameraGUI, 'EditMode').onChange(function(newValue){
   console.log("Value changed to:  ", newValue);
   ChangeEditMode(newValue);
+  if(newValue ==true){
+    ViewMenu = datGUI.addFolder('ViewMenu');
+  }
+
 
 });
 datGUI.add(cameraGUI, 'SelectSphere').onChange(function(newValue){
@@ -109,13 +128,16 @@ datGUI.add(cameraGUI, 'SelectSphere').onChange(function(newValue){
 
 
 
+
 });
+datGUI.add(cameraGUI, 'playtour');
 
 var InEditMode = true;
 function ChangeEditMode(newValue){
   InEditMode = newValue;
   console.log("InEditMode changed to: ", InEditMode);
 }
+datGUI.add(cameraGUI, 'changeorder');
 //GUI Controls
 
 
@@ -294,7 +316,7 @@ function init() {
 
 
         controls = new THREE.TrackballControls( camera, canvas3D );
-      	controls.minDistance = 50;
+      	controls.minDistance = 20;
       	controls.maxDistance = 200;
 
         raycaster = new THREE.Raycaster()
@@ -565,14 +587,69 @@ function AkeyDown(event){
     CurrCamPos.set(camera.position.x, camera.position.y, camera.position.z);
     console.log("CurrCamPos = ", CurrCamPos);
     AnnotCamPos.push(CurrCamPos);
+    cameraGUI.Annot[camcounter] = AnnotCamPos[camcounter].x;
+    ViewMenu.add(cameraGUI.Annot, camcounter, cameraGUI.Annot[camcounter]).listen();
 
+    cameraGUI.Tips[camcounter] = 'Tip1';
+    ViewMenu.add(cameraGUI.Tips, camcounter, cameraGUI.Tips[camcounter]).onChange(function(newValue){
+      console.log('-------Previous tooltip text = ', tooltiptext[camcounter]);
+      tooltiptext[camcounter] = newValue;
+      console.log('-------New tooltip text ', tooltiptext[camcounter]);
+      CreateToolTip(tooltiptext[camcounter]);
+    });
+
+
+    // ViewMenu.add(cameraGUI, 'annotcampos').listen();
+
+    camcounter += 1;
     console.log("AnnotCamPos=  ", AnnotCamPos[camcounter -1]);
+
     // camera.position.x=AnnotCamPos[camcounter].x;
     // camera.position.y=AnnotCamPos[camcounter].y;
     // camera.position.z=AnnotCamPos[camcounter].z;
 
   }
   console.log("AkeyIsDOOOOOOWWWNN", AkeyIsDown);
+
+}
+
+function CreateToolTip(tooltiptext){
+  if(annotcounter != 0){
+    var element = document.getElementById("newdiv");
+    element.parentNode.removeChild(element);
+    console.log('remove');
+  }
+  var mydiv = document.getElementById('mydiv');
+  console.log(mydiv);
+  var newdiv = document.createElement("div");
+  //var tooltip = '<div class="tooltip"><p>This is a tooltip. It is typically used to explain something to a user without taking up space on the page.</p></div>'
+    pTagArray[0] = "<p>";
+    pTagArray[1] = tooltiptext;
+    pTagArray[2] = "</p>";
+    var newPTag = pTagArray.join("");
+
+    // newdiv.innerHTML = "<p>This is a tooltip. It is typically used to explain something to a user without taking up space on the page.</p>"
+    newdiv.innerHTML = newPTag;
+    newdiv.setAttribute("class", "bubble");
+    newdiv.setAttribute("id", "newdiv");
+    mydiv.appendChild(newdiv);
+    console.log('Im fine');
+
+    //Change annotation
+    var color = window.getComputedStyle(
+      document.querySelector('.bubble'), ':after'
+    ).getPropertyValue('left');
+    console.log(color);
+    color = "30px";
+
+    console.log(color);
+
+    console.log(annotcounter);
+
+    var list = document.getElementsByClassName("bubble")[0];
+    list.style.top = "10px";
+    list.style.left = "1px";
+      annotcounter+= 1;
 
 }
 
@@ -606,7 +683,7 @@ function FreezeSphere(camlookatpoint, camposalongnormal) {
   camera.position.x=dummycamposnormal.x;
   camera.position.y=dummycamposnormal.y;
   camera.position.z=dummycamposnormal.z;
-  camcounter += 1;
+
   console.log("CurrentCamPos object", camera.position.x);
 
 
@@ -641,6 +718,71 @@ function FreezeSphere(camlookatpoint, camposalongnormal) {
 }
 
 
+function PlayTour(){
+  tour_counter=0;
+  camera.position.x=AnnotCamPos[tour_counter].x;
+  camera.position.y=AnnotCamPos[tour_counter].y;
+  camera.position.z=AnnotCamPos[tour_counter].z;
+
+  console.log("camera.up=",camera.up);
+  // camera.lookAt(AnnotCamLookatPts[camcounter_gui]);
+  controls.target=AnnotCamLookatPts[tour_counter];
+  camera.up = new THREE.Vector3(0,1,0);
+
+  datGUI.add(cameraGUI, 'nextview');
+  datGUI.add(cameraGUI, 'previousview');
+
+
+
+}
+
+function NextView(){
+  console.log('----------NEXT VIEW------------');
+  tour_counter+=1;
+  if(tour_counter>AnnotCamPos.length-1){ tour_counter=AnnotCamPos.length -1; }
+  camera.position.x=AnnotCamPos[tour_counter].x;
+  camera.position.y=AnnotCamPos[tour_counter].y;
+  camera.position.z=AnnotCamPos[tour_counter].z;
+
+  console.log("camera.up=",camera.up);
+  // camera.lookAt(AnnotCamLookatPts[camcounter_gui]);
+  controls.target=AnnotCamLookatPts[tour_counter];
+  camera.up = new THREE.Vector3(0,1,0);
+  console.log('------TOUR COUNTER---- =', tour_counter);
+
+}
+
+function PreviousView(){
+
+  tour_counter-=1;
+  if (tour_counter<0){ tour_counter=0; }
+  camera.position.x=AnnotCamPos[tour_counter].x;
+  camera.position.y=AnnotCamPos[tour_counter].y;
+  camera.position.z=AnnotCamPos[tour_counter].z;
+
+  console.log("camera.up=",camera.up);
+  // camera.lookAt(AnnotCamLookatPts[camcounter_gui]);
+  controls.target=AnnotCamLookatPts[tour_counter];
+  camera.up = new THREE.Vector3(0,1,0);
+  console.log('------TOUR COUNTER---- =', tour_counter);
+
+}
+
+Array.prototype.move = function (from, to) {
+  this.splice(to, 0, this.splice(from, 1)[0]);
+};
+
+function ChangeAnnotOrder(){
+  console.log("-----Before Move AnnotCamPos =",AnnotCamPos[0]);
+  console.log("-----Before Move AnnotCamPos =",AnnotCamPos[1]);
+  AnnotCamPos.move(0, 1);
+  AnnotCamLookatPts.move(0,1);
+  console.log("-----After Move AnnotCamPos =",AnnotCamPos[0]);
+  console.log("-----After Move AnnotCamPos =",AnnotCamPos[1]);
+
+}
+
+
 function loadLeePerrySmith( callback ) {
   var loader = new THREE.JSONLoader();
   loader.load( '../models/Homo_Erectus/Low.js', function( geometry ) {
@@ -663,7 +805,7 @@ function loadLeePerrySmith( callback ) {
 
 function loadLeePerrySmith( callback ) {
   var loader = new THREE.JSONLoader();
-  loader.load( '../models/Homo_Erectus/Low.json', function( geometry ) {
+  loader.load( '../models/Homo_Erectus/Low_180.json', function( geometry ) {
     var material = new THREE.MeshPhongMaterial( {
       specular: 0x111111,
       map: textureLoader.load( '../models/Homo_Erectus/ALBEDO1k.jpg' ),
@@ -674,7 +816,7 @@ function loadLeePerrySmith( callback ) {
     } );
     LeePerryMesh = new THREE.Mesh( geometry, material );
     scene.add( LeePerryMesh );
-    LeePerryMesh.scale.set( 10, 10, 10 );
+    LeePerryMesh.scale.set( 3, 3, 3 );
     //scene.add( new THREE.FaceNormalsHelper( mesh, 1 ) );
     //scene.add( new THREE.VertexNormalsHelper( mesh, 1 ) );
     console.log('Loaded Perry Smith')
