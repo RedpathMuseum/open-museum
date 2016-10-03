@@ -600,12 +600,22 @@ function AkeyDown(event){
 
     cameraGUI.Tips[camcounter] = 'Tip'+camcounter;
     ViewMenu.add(cameraGUI.Tips, camcounter, cameraGUI.Tips[camcounter]).onChange(function(newValue){
-      console.log('-------Previous tooltip text = ', tooltiptext[camcounter]);
-      tooltiptext[camcounter] = newValue;
-      console.log('-------New tooltip text ', tooltiptext[camcounter]);
-      CreateToolTip(tooltiptext[camcounter]);
+      if(playing_tour==true){
+        console.log('-------Previous tooltip text = ', tooltiptext[camcounter]);
+        tooltiptext[tour_counter] = newValue;
+        console.log('-------New tooltip text ', tooltiptext[tour_counter]);
+        console.log('-------On Change TOOLTIP_ID ', "tooltip"+tour_counter );
+        for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
+          if(i!=tour_counter){
+            document.getElementById("tooltip"+i).style.visibility='hidden';
+          }
+        }
+        ChangeToolTipText(tooltiptext[camcounter], "tooltip"+tour_counter);
+      }
     });
 
+
+    CreateToolTip(tooltiptext[camcounter], camcounter);
 
     // ViewMenu.add(cameraGUI, 'annotcampos').listen();
 
@@ -621,44 +631,57 @@ function AkeyDown(event){
 
 }
 
-function CreateToolTip(tooltiptext){
-  if(annotcounter != 0){
-    var element = document.getElementById("newdiv");
-    element.parentNode.removeChild(element);
-    console.log('remove');
-  }
+function CreateToolTip(tooltiptext, camcounter){
+  //Function to remove a div
+  // if(annotcounter != 0){
+  //   var element = document.getElementById("newdiv");
+  //   element.parentNode.removeChild(element);
+  //   console.log('remove');
+  // }
   var mydiv = document.getElementById('mydiv');
   console.log(mydiv);
   var newdiv = document.createElement("div");
-  //var tooltip = '<div class="tooltip"><p>This is a tooltip. It is typically used to explain something to a user without taking up space on the page.</p></div>'
-    pTagArray[0] = "<p>";
-    pTagArray[1] = tooltiptext;
-    pTagArray[2] = "</p>";
-    var newPTag = pTagArray.join("");
 
-    // newdiv.innerHTML = "<p>This is a tooltip. It is typically used to explain something to a user without taking up space on the page.</p>"
-    newdiv.innerHTML = newPTag;
-    newdiv.setAttribute("class", "bubble");
-    newdiv.setAttribute("id", "newdiv");
-    mydiv.appendChild(newdiv);
-    console.log('Im fine');
+  pTagArray[0] = "<p>";
+  pTagArray[1] = tooltiptext;
+  pTagArray[2] = "</p>";
+  var newPTag = pTagArray.join("");
 
-    //Change annotation
-    var color = window.getComputedStyle(
-      document.querySelector('.bubble'), ':after'
-    ).getPropertyValue('left');
-    console.log(color);
-    color = "30px";
+  newdiv.innerHTML = newPTag;
+  newdiv.setAttribute("class", "bubble");
+  var div_id = "tooltip"+camcounter;
+  newdiv.setAttribute("id", div_id);
+  mydiv.appendChild(newdiv);
+  console.log('Im fine');
 
-    console.log(color);
+  //Change annotation
+  var color = window.getComputedStyle(
+    document.querySelector('.bubble'), ':after'
+  ).getPropertyValue('left');
+  console.log(color);
+  color = "30px";
 
-    console.log(annotcounter);
+  console.log(color);
 
-    var list = document.getElementsByClassName("bubble")[0];
-    list.style.top = "10px";
-    list.style.left = "1px";
-      annotcounter+= 1;
+  console.log(annotcounter);
 
+  var list = document.getElementsByClassName("bubble")[0];
+  list.style.top = "10px";
+  list.style.left = "1px";
+  annotcounter+= 1;
+
+}
+
+function ChangeToolTipText(tooltiptext, tooltip_id){
+
+  pTagArray[0] = "<p>";
+  pTagArray[1] = tooltiptext;
+  pTagArray[2] = "</p>";
+  var newPTag = pTagArray.join("");
+
+  var selected_div = document.getElementById(tooltip_id);
+  console.log('----Selected DIV------', selected_div);
+  selected_div.innerHTML = newPTag;
 }
 
 function FreezeSphere(camlookatpoint, camposalongnormal) {
