@@ -588,7 +588,7 @@ function AkeyDown(event){
     console.log("Freeze Sphere fctn camcounter = ", camcounter);
   }
   else if (keyCode==83 && AkeyIsDown==true){
-    console.log("INSIDE 83--------");
+    console.log("INSIDE 83--------S Key Down");
     console.log("camcounter at CamPosEdit", camcounter);
     var CurrCamPos = new THREE.Vector3();
     // console.log("camera.position = ", camera.position)
@@ -598,7 +598,7 @@ function AkeyDown(event){
     cameraGUI.Annot[camcounter] = AnnotCamPos[camcounter].x;
     ViewMenu.add(cameraGUI.Annot, camcounter, cameraGUI.Annot[camcounter]).listen();
 
-    cameraGUI.Tips[camcounter] = 'Tip1';
+    cameraGUI.Tips[camcounter] = 'Tip'+camcounter;
     ViewMenu.add(cameraGUI.Tips, camcounter, cameraGUI.Tips[camcounter]).onChange(function(newValue){
       console.log('-------Previous tooltip text = ', tooltiptext[camcounter]);
       tooltiptext[camcounter] = newValue;
@@ -726,19 +726,25 @@ function FreezeSphere(camlookatpoint, camposalongnormal) {
 }
 
 
+var playing_tour = true;
 function PlayTour(){
-  tour_counter=0;
-  camera.position.x=AnnotCamPos[tour_counter].x;
-  camera.position.y=AnnotCamPos[tour_counter].y;
-  camera.position.z=AnnotCamPos[tour_counter].z;
 
-  console.log("camera.up=",camera.up);
-  // camera.lookAt(AnnotCamLookatPts[camcounter_gui]);
-  controls.target=AnnotCamLookatPts[tour_counter];
-  camera.up = new THREE.Vector3(0,1,0);
+  if(playing_tour==true){
+    tour_counter=0;
+    camera.position.x=AnnotCamPos[tour_counter].x;
+    camera.position.y=AnnotCamPos[tour_counter].y;
+    camera.position.z=AnnotCamPos[tour_counter].z;
 
-  datGUI.add(cameraGUI, 'nextview');
-  datGUI.add(cameraGUI, 'previousview');
+    console.log("camera.up=",camera.up);
+    // camera.lookAt(AnnotCamLookatPts[camcounter_gui]);
+    controls.target=AnnotCamLookatPts[tour_counter];
+    camera.up = new THREE.Vector3(0,1,0);
+
+    datGUI.add(cameraGUI, 'nextview');
+    datGUI.add(cameraGUI, 'previousview');
+
+    playing_tour=false;
+  }
 
 
 
@@ -775,6 +781,7 @@ function PreviousView(){
   console.log('------TOUR COUNTER---- =', tour_counter);
 
 }
+//TODO: Make EraseTour function and EditSlectedView function
 
 Array.prototype.move = function (from, to) {
   this.splice(to, 0, this.splice(from, 1)[0]);
