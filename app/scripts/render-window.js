@@ -777,6 +777,23 @@ function PlayTour(){
 
 }
 
+function SelectViewFromIndex(view_index){
+
+  camera.position.x=AnnotCamPos[view_index].x;
+  camera.position.y=AnnotCamPos[view_index].y;
+  camera.position.z=AnnotCamPos[view_index].z;
+  controls.target=AnnotCamLookatPts[view_index];
+  camera.up = new THREE.Vector3(0,1,0);
+  for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
+    if(i!=tour_counter){
+      document.getElementById("tooltip"+i).style.visibility='hidden';
+    }
+    else{
+      document.getElementById("tooltip"+i).style.visibility='visible';
+    }
+  }
+}
+
 //TODO:Should be a variation of SelectView function
   //Should just slect next view in the Queue
 function NextView(){
