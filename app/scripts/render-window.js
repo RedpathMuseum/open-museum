@@ -587,7 +587,13 @@ function AkeyDown(event){
 
     console.log("Freeze Sphere fctn camcounter = ", camcounter);
   }
+  //Press S if A key has been pressed
+  //TODO:This elseif statement should be a SaveView function called if in EditMode and New View fucntion was called
+    //  Save View should be:
+    //Create NewView then Select New View to edit it
   else if (keyCode==83 && AkeyIsDown==true){
+
+
     console.log("INSIDE 83--------S Key Down");
     console.log("camcounter at CamPosEdit", camcounter);
     var CurrCamPos = new THREE.Vector3();
@@ -597,34 +603,32 @@ function AkeyDown(event){
     AnnotCamPos.push(CurrCamPos);
     cameraGUI.Annot[camcounter] = AnnotCamPos[camcounter].x;
     ViewMenu.add(cameraGUI.Annot, camcounter, cameraGUI.Annot[camcounter]).listen();
+    for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
+      if(i!=camcounter){
+        document.getElementById("tooltip"+i).style.visibility='hidden';
+      }
+    }
 
     cameraGUI.Tips[camcounter] = 'Tip'+camcounter;
     ViewMenu.add(cameraGUI.Tips, camcounter, cameraGUI.Tips[camcounter]).onChange(function(newValue){
-      if(playing_tour==true){
-        console.log('-------Previous tooltip text = ', tooltiptext[camcounter]);
-        tooltiptext[tour_counter] = newValue;
-        console.log('-------New tooltip text ', tooltiptext[tour_counter]);
-        console.log('-------On Change TOOLTIP_ID ', "tooltip"+tour_counter );
-        for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
-          if(i!=tour_counter){
-            document.getElementById("tooltip"+i).style.visibility='hidden';
-          }
-        }
-        ChangeToolTipText(tooltiptext[camcounter], "tooltip"+tour_counter);
-      }
+      var Tips_array_current_index = this.property;
+      console.log('-------Previous tooltip text = ', Tips_array_current_index);
+      tooltiptext[Tips_array_current_index] = newValue;
+      console.log('-------New tooltip text ', tooltiptext[Tips_array_current_index]);
+      console.log('-------On Change TOOLTIP_ID ', "tooltip"+Tips_array_current_index );
+      // for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
+      //   if(i!=tour_counter){
+      //     document.getElementById("tooltip"+i).style.visibility='hidden';
+      //   }
+      // }
+      ChangeToolTipText(tooltiptext[Tips_array_current_index], "tooltip"+Tips_array_current_index);
+
     });
 
-
     CreateToolTip(tooltiptext[camcounter], camcounter);
-
     // ViewMenu.add(cameraGUI, 'annotcampos').listen();
-
     camcounter += 1;
     console.log("AnnotCamPos=  ", AnnotCamPos[camcounter -1]);
-
-    // camera.position.x=AnnotCamPos[camcounter].x;
-    // camera.position.y=AnnotCamPos[camcounter].y;
-    // camera.position.z=AnnotCamPos[camcounter].z;
 
   }
   console.log("AkeyIsDOOOOOOWWWNN", AkeyIsDown);
@@ -773,6 +777,8 @@ function PlayTour(){
 
 }
 
+//TODO:Should be a variation of SelectView function
+  //Should just slect next view in the Queue
 function NextView(){
   console.log('----------NEXT VIEW------------');
   tour_counter+=1;
@@ -786,6 +792,15 @@ function NextView(){
   controls.target=AnnotCamLookatPts[tour_counter];
   camera.up = new THREE.Vector3(0,1,0);
   console.log('------TOUR COUNTER---- =', tour_counter);
+  for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
+    if(i!=tour_counter){
+      document.getElementById("tooltip"+i).style.visibility='hidden';
+    }
+    else{
+      document.getElementById("tooltip"+i).style.visibility='visible';
+    }
+  }
+
 
 }
 
@@ -802,6 +817,15 @@ function PreviousView(){
   controls.target=AnnotCamLookatPts[tour_counter];
   camera.up = new THREE.Vector3(0,1,0);
   console.log('------TOUR COUNTER---- =', tour_counter);
+  for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
+    if(i!=tour_counter){
+      document.getElementById("tooltip"+i).style.visibility='hidden';
+    }
+    else{
+      document.getElementById("tooltip"+i).style.visibility='visible';
+    }
+  }
+
 
 }
 //TODO: Make EraseTour function and EditSlectedView function
