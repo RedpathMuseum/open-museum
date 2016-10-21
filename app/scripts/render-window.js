@@ -198,7 +198,7 @@ function init() {
 
     // renderer
     renderer = new THREE.WebGLRenderer({canvas: canvas3D} );
-    renderer.setSize( WIDTH,LENGTH );
+    renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.setClearColor( 0xF2F2F2, 1);
 
     // CSS3D Renderer
@@ -358,94 +358,88 @@ function init() {
 
         window.addEventListener("keydown", leftArrowKeyDown, false);
 
-
-
-        function onTouchMove( event ) {
-          if ( event.changedTouches ) {
-            x = event.changedTouches[ 0 ].pageX;
-            y = event.changedTouches[ 0 ].pageY;
-          } else {
-            x = event.clientX;
-            y = event.clientY;
-          }
-
-          console.log('This is mouse x real '+event.clientX);
-          console.log('This is mouse y real '+event.clientY);
-
-          mouse.x = ( x / window.innerWidth ) * 2 - 1;
-          mouse.y = - ( y / window.innerHeight ) * 2 + 1;
-
-
-          console.log('This is mouse x relative '+mouse.x);
-          console.log('This is mouse y relative '+mouse.y);
-          checkIntersection(mouse.y);
-        }
-
-        function checkIntersection() {
-          // if ( ! LeePerryMesh ) return;
-          raycaster.setFromCamera( mouse, camera );
-          var intersects = raycaster.intersectObjects( [ LeePerryMesh ] );
-          if ( intersects.length > 0 ) {
-            var p = intersects[ 0 ].point;
-            mouseHelper.position.copy( p );
-            intersection.point.copy( p );
-            var n = intersects[ 0 ].face.normal.clone();
-            console.log("before mult scalar");
-            console.log(n);
-            n.multiplyScalar( 10 );
-            console.log("Ater multscalar before adding p");
-            console.log(n);
-            n.add( intersects[ 0 ].point );
-            intersection.normal.copy( intersects[ 0 ].face.normal );
-            mouseHelper.lookAt( n );
-            line.geometry.vertices[ 0 ].copy( intersection.point );
-            line.geometry.vertices[ 1 ].copy( n );
-            line.geometry.verticesNeedUpdate = true;
-            intersection.intersects = true;
-            console.log("interesect normal after mult scalar ");
-            console.log(n);
-            console.log("intersect point ");
-            console.log(p);
-            camlookatpoint = line.geometry.vertices[ 0 ].copy( intersection.point );
-            console.log("camlookatpoint");
-            console.log(camlookatpoint);
-            camposalongnormal = line.geometry.vertices[ 1 ].copy( n );
-            console.log("camposalongnormal");
-            console.log(camposalongnormal);
-            console.log('camcurrentlook');
-            console.log(camera.getWorldDirection());
-            console.log('camcurrentposition');
-            console.log(camera.position);
-            CurrSphereData[0] = camlookatpoint;
-            CurrSphereData[1] = camposalongnormal;
-            if(InEditMode == true){
-              Sphere.position.copy(camlookatpoint);
-              Sphere.visible = true;
-              // if(AkeyIsDown==true){
-              //   console.log("CAAAALLLLING FREEZZZZZEEEEE");
-                // FreezeSphere(camlookatpoint, camposalongnormal);
-              // }
-            }
-            else{
-              Sphere.visible= false;
-            }
-
-          }
-          else {
-            intersection.intersects = false;
-            Sphere.visible = false;
-          }
-      }
-
-
-
-
-
-
-      //Code for Raycaster
-
-
 }
+
+function onTouchMove( event ) {
+  if ( event.changedTouches ) {
+    x = event.changedTouches[ 0 ].pageX;
+    y = event.changedTouches[ 0 ].pageY;
+  } else {
+    x = event.clientX;
+    y = event.clientY;
+  }
+
+  console.log('This is mouse x real '+event.clientX);
+  console.log('This is mouse y real '+event.clientY);
+
+  mouse.x = ( x / window.innerWidth ) * 2 - 1;
+  mouse.y = - ( y / window.innerHeight ) * 2 + 1;
+
+
+  console.log('This is mouse x relative '+mouse.x);
+  console.log('This is mouse y relative '+mouse.y);
+  checkIntersection(mouse.y);
+}
+
+function checkIntersection() {
+  // if ( ! LeePerryMesh ) return;
+  raycaster.setFromCamera( mouse, camera );
+  var intersects = raycaster.intersectObjects( [ LeePerryMesh ] );
+  if ( intersects.length > 0 ) {
+    var p = intersects[ 0 ].point;
+    mouseHelper.position.copy( p );
+    intersection.point.copy( p );
+    var n = intersects[ 0 ].face.normal.clone();
+    console.log("before mult scalar");
+    console.log(n);
+    n.multiplyScalar( 10 );
+    console.log("Ater multscalar before adding p");
+    console.log(n);
+    n.add( intersects[ 0 ].point );
+    intersection.normal.copy( intersects[ 0 ].face.normal );
+    mouseHelper.lookAt( n );
+    line.geometry.vertices[ 0 ].copy( intersection.point );
+    line.geometry.vertices[ 1 ].copy( n );
+    line.geometry.verticesNeedUpdate = true;
+    intersection.intersects = true;
+    console.log("interesect normal after mult scalar ");
+    console.log(n);
+    console.log("intersect point ");
+    console.log(p);
+    camlookatpoint = line.geometry.vertices[ 0 ].copy( intersection.point );
+    console.log("camlookatpoint");
+    console.log(camlookatpoint);
+    camposalongnormal = line.geometry.vertices[ 1 ].copy( n );
+    console.log("camposalongnormal");
+    console.log(camposalongnormal);
+    console.log('camcurrentlook');
+    console.log(camera.getWorldDirection());
+    console.log('camcurrentposition');
+    console.log(camera.position);
+    CurrSphereData[0] = camlookatpoint;
+    CurrSphereData[1] = camposalongnormal;
+    if(InEditMode == true){
+      Sphere.position.copy(camlookatpoint);
+      Sphere.visible = true;
+      // if(AkeyIsDown==true){
+      //   console.log("CAAAALLLLING FREEZZZZZEEEEE");
+        // FreezeSphere(camlookatpoint, camposalongnormal);
+      // }
+    }
+    else{
+      Sphere.visible= false;
+    }
+
+  }
+  else {
+    intersection.intersects = false;
+    Sphere.visible = false;
+  }
+}
+
+
+//Code for Raycaster
+
 
 
 function leftArrowKeyDown(event) {
@@ -503,6 +497,26 @@ function leftArrowKeyDown(event) {
     // else {
     // console.log("Oh no you didn't.");
     // }
+}
+
+var AnnotatioObj = function () {
+
+  console.log("New annotation created");
+  camcounter+=1;
+
+  this.text = "Default text";
+  //TODO: Add more CSS properties of the bubble (color, size)
+  //this.position
+}
+
+var View = function (camlookatpoint, camposition) {
+  this.camera_position = new THREE.Vector3();
+  this.camera_target = new THREE.Vector3();
+  this.annotation = new AnnotationObj();
+
+  this.camera_target.copy(camlookatpoint);
+  this.camera_position.copy(camposition);
+
 }
 
 //Same function as leftArrowKeyDown, modified to satisfy datGUI with no error handling
@@ -688,10 +702,10 @@ function ChangeToolTipText(tooltiptext, tooltip_id){
   selected_div.innerHTML = newPTag;
 }
 
+var annot_buffer;
 function FreezeSphere(camlookatpoint, camposalongnormal) {
 
-
-
+  //FreezeMarker
   console.log('FreezingSphere');
   var dummySphereGeo = new THREE.SphereGeometry( 5, 32, 32 );
   var dummyMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00} );
@@ -704,12 +718,14 @@ function FreezeSphere(camlookatpoint, camposalongnormal) {
 
   AnnotSpheres.push(dummySphere);
   // AnnotCamPos.push(dummycamposnormal);
+
   AnnotCamLookatPts.push(dummySphere.position);
   // console.log("AnnotCamPos = ", AnnotCamPos[camcounter]);
   // camera.lookAt(AnnotCamLookatPts[camcounter]);
 
+  //-Change camera position and target
   console.log("camera.up=",camera.up);
-  controls.target=AnnotCamLookatPts[camcounter];
+  controls.target=dummySphere.position;
   camera.up = new THREE.Vector3(0,1,0);
 
   // camera.position.x=AnnotCamPos[camcounter].x;
@@ -719,37 +735,18 @@ function FreezeSphere(camlookatpoint, camposalongnormal) {
   camera.position.y=dummycamposnormal.y;
   camera.position.z=dummycamposnormal.z;
 
-  console.log("CurrentCamPos object", camera.position.x);
+  //-Create Buffer View.camera_target
+  //-Create Buffer View.camera_position
+  //-Wait for user input (Save or Cancel)
+  //-Create and populate new View
+  //-Add View to Queue/Annot tour
+  //-Prompt user to edit text
 
 
+}
 
-  // var camlookatpoints = {
-  //   look1: new THREE.Vector3(119, 116, 293),
-  //   look2: new THREE.Vector3(75, 73, 57),
-  //   look3: new THREE.Vector3(105, 95, 2)
-  // };
-  // var camposition = {
-  //   pos1: new THREE.Vector3(119, 116, 303),
-  //   pos2: new THREE.Vector3(68, 67, 54),
-  //   pos3: new THREE.Vector3(103, 93, -7)
-  // };
+function ChooseCameraPos(){
 
-  // var look = new THREE.Vector3(119, 116, 293 );
-  // var pos = new THREE.Vector3(119, 116, 303);
-  //
-  // camera.lookAt(stl_1.position);
-  // camera.position.x=stl_1.position.x - camcounter*10;
-  // camera.position.y=stl_1.position.y + camcounter*10 ;
-  // camera.position.z=CAMERA_DISTANCE+20*camcounter;
-
-  // camera.lookAt(look);
-  // camera.position.x=pos.x ;
-  // camera.position.y=pos.y ;
-  // camera.position.z=pos.z + 100*camcounter;
-
-
-  //camcounter += 1;
-  //console.log(camcounter);
 }
 
 
