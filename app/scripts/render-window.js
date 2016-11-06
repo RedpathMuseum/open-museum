@@ -9,12 +9,7 @@ if (screen.width <= 960) {
 var CAMERA_DISTANCE = -20;
 
 var camcounter =0;
-var camPLcounter = 0;
-var numOfAnnotations = 4;
-var annotcounter = 0;
 var tour_counter=0;
-
-var AkeyIsDown;
 
 //JSON Loader's variables for files paths
 var object_to_load_obj_path = '../models/Homo_Erectus/Low_180.json';
@@ -25,26 +20,6 @@ var object_to_load_normalmap_path = '../models/Homo_Erectus/NORMAL1K.jpg';
 
 var camlookat_start = new THREE.Vector3(0.018518396076858696, 0.08320761783954866,-0.9963601669693058);
 var camposition_start = new THREE.Vector3(-5.488823519163917, 4.861637666233516, 221.22000845737145);
-
-var camlookatpoints = [];
-// camlookatpoints[0] = new THREE.Vector3(119, 116, 293);
-camlookatpoints[0] = new THREE.Vector3(7, -12, -17);
-camlookatpoints[1] = new THREE.Vector3(14.486004686585296, 20.973093793771437, 0.260283392977336);
-//x: 14.486004686585296, y: 20.973093793771437, z: 0.260283392977336}
-//75, 73, 57
-camlookatpoints[2] = new THREE.Vector3(-1.7851443607485407, 21.50316117649372, 21.947977163593784);
-//x: -1.7851443607485407, y: 21.50316117649372, z: 21.947977163593784
-camlookatpoints[3] = new THREE.Vector3(0,0,20);
-
-var campositions = [];
-//campositions[0] = new THREE.Vector3(119, 116, 303);
-campositions[0] = new THREE.Vector3(10, -6, -24);
-campositions[1] = new THREE.Vector3(24.227563973893602, 19.614504700896756, 2.0647939439520857);
-//24.227563973893602, y: 19.614504700896756, z: 2.0647939439520857
-//68, 67, 54
-campositions[2] = new THREE.Vector3(-1.0199619000466296,20.45148443807288, 31.86847483897232);
-//x: -1.0199619000466296, y: 20.45148443807288, z: 31.86847483897232
-campositions[3] = new THREE.Vector3(0,0,20);
 
 //Configuration variables set in edit mode
 var AnnotSpheres = [];
@@ -62,7 +37,6 @@ var y;
 var raycaster;
 var mesh;
 var stl_1 = new THREE.Mesh();
-// var cube;
 var cameraTarget = new THREE.Mesh( new THREE.CubeGeometry(0,0,0));
 var line;
 var mouseHelper;
@@ -100,10 +74,9 @@ var pTagArray = [];
 var camcounter_gui = 0;
 var cameraGUI = new function () {
   this.message = 'cameraGUI';
-  this.explode = function() { ChangeCameraView(); };
-  this.playtour = function() { PlayTour(); };
-  this.nextview = function() { NextView(); };
-  this.previousview = function() { PreviousView(); };
+  this.playtour = function() { Annotation_Set.PlayTour(); };
+  this.nextview = function() { Annotation_Set.NextView(); };
+  this.previousview = function() { Annotation_Set.PreviousView(); };
   this.changeorder = function() { ChangeAnnotOrder(); };
   this.EditMode  = false;
   this.NewAnnotation = function() { NewAnnotation(); };
@@ -122,7 +95,6 @@ var ViewMenu;
 var datGUI = new dat.GUI();
 
 datGUI.add(cameraGUI, 'message');
-datGUI.add(cameraGUI, 'explode');
 datGUI.add(cameraGUI, 'EditMode').onChange(function(newValue){
   console.log("Value changed to:  ", newValue);
   ChangeEditMode(newValue);
@@ -226,9 +198,6 @@ function init() {
 
     scene.add( camera ); // required, because we are adding a light as a child of the camera
 
-    // var cube = new THREE.Mesh( new THREE.CubeGeometry(1,1,1), new THREE.MeshNormalMaterial() );
-    // scene.add(cube);
-
     //Add annotation sphere
     scene.add( Sphere );
     Sphere.visible = false;
@@ -255,21 +224,14 @@ function init() {
     var axisHelper = new THREE.AxisHelper( 5 );
     scene.add( axisHelper );
 
-    // Controlls
-    //controls = new THREE.TrackballControls( camera, canvas3D );
-
     // lights
     scene.add( new THREE.AmbientLight( 0x222222 ) );
 
     var light = new THREE.PointLight( 0xffffff, 0.8 );
     camera.add( light );
 
-    // camera.lookAt(mesh.position)
-    // camera.position.x=mesh.position.x;
-    // camera.position.y=mesh.position.y;
-    // camera.position.z=CAMERA_DISTANCE;
 
-    // TODO Remove dead code block
+  // TODO Save STLLoader initialization dead code block
     //Loading a .stl file
     //var loader = new THREE.STLLoader();
 
@@ -306,7 +268,7 @@ function init() {
 				var onError = function ( xhr ) {
 				};
 
-    // TODO: Remove dead code block
+    // TODO: Save OBJLoader initialization
 //      var manager = new THREE.LoadingManager();
 //      // model
 //				var loader = new THREE.OBJLoader( manager );
@@ -326,11 +288,10 @@ function init() {
 
 
         //Code for Raycaster
-
         var geometry = new THREE.Geometry();
         geometry.vertices.push( new THREE.Vector3(), new THREE.Vector3() );
 
-
+        // Controls
         controls = new THREE.TrackballControls( camera, canvas3D );
       	controls.minDistance = 20;
       	controls.maxDistance = 200;
@@ -353,8 +314,6 @@ function init() {
           moved = false;
         }, false );
 
-        window.addEventListener("keydown", AkeyDown, false);
-
         window.addEventListener( 'mouseup', function() {
           checkIntersection();
           // if ( ! moved ){
@@ -363,8 +322,6 @@ function init() {
         });
         window.addEventListener( 'mousemove', onTouchMove );
         window.addEventListener( 'touchmove', onTouchMove );
-
-        window.addEventListener("keydown", leftArrowKeyDown, false);
 
 }
 
@@ -429,10 +386,6 @@ function checkIntersection() {
     if(InEditMode == true){
       Sphere.position.copy(camlookatpoint);
       Sphere.visible = true;
-      // if(AkeyIsDown==true){
-      //   console.log("CAAAALLLLING FREEZZZZZEEEEE");
-        // FreezeSphere(camlookatpoint, camposalongnormal);
-      // }
     }
     else{
       Sphere.visible= false;
@@ -444,68 +397,7 @@ function checkIntersection() {
     Sphere.visible = false;
   }
 }
-
-
 //Code for Raycaster
-
-
-
-function leftArrowKeyDown(event) {
-
-  var keyCode = event.keyCode;
-  if(keyCode==37) {
-    console.log("You hit the left arrow key.");
-    // console.log(camlookatpoints[camcounter]);
-    console.log(campositions[camcounter]);
-    camera.lookAt(camlookatpoints[camcounter]);
-    camera.position.x=campositions[camcounter].x;
-    camera.position.y=campositions[camcounter].y;
-    camera.position.z=campositions[camcounter].z;
-    console.log(camcounter);
-  //  controls.target = camlookatpoints[camcounter];
-
-
-
-
-      if (camcounter != numOfAnnotations -1) {
-        camcounter+= 1;
-      }
-      else {
-        camcounter = 0;
-      }
-
-    }
-    else if(keyCode ==39) {
-      camera.lookAt(camlookat_start);
-      camera.position.x = camposition_start.x;
-      camera.position.x = camposition_start.y;
-      camera.position.x = camposition_start.z;
-      console.log('Reset camera');
-    }
-
-    else if(keyCode ==38) {
-      console.log("keycode 38 pressed up arrow, camera_gui= ", camcounter_gui);
-      console.log("AnnotCamLookatPts[camcounter_gui] =" , AnnotCamLookatPts[camcounter_gui]);
-      console.log("  camera.position.x=AnnotCamPos[camcounter_gui];",   AnnotCamPos[camcounter_gui]);
-      camera.position.x=AnnotCamPos[camcounter_gui].x;
-      camera.position.y=AnnotCamPos[camcounter_gui].y;
-      camera.position.z=AnnotCamPos[camcounter_gui].z;
-
-      console.log("camera.up=",camera.up);
-      // camera.lookAt(AnnotCamLookatPts[camcounter_gui]);
-      controls.target=AnnotCamLookatPts[camcounter_gui];
-      camera.up = new THREE.Vector3(0,1,0);
-
-
-      // cameraTarget.position.x=AnnotCamLookatPts[camcounter_gui].x;
-      // cameraTarget.position.y=AnnotCamLookatPts[camcounter_gui].y;
-      // cameraTarget.position.z=AnnotCamLookatPts[camcounter_gui].z;
-
-    }
-    // else {
-    // console.log("Oh no you didn't.");
-    // }
-}
 
 var annot_obj_counter = 0;
 var AnnotationObj = function (camlookatpoint, camposition) {
@@ -560,17 +452,17 @@ AnnotationSet.prototype.DeleteAnnotation = function(queue_index){
 AnnotationSet.prototype.NextView = function(){
   this.queue.curr_annot_index+=1;
 
-  //If ccondition to wrap around if last annotation
-  if(curr_annot_index>this.queue.length -1){ curr_annot_index=0; }
-  camera.position.x = this.queue[curr_annot_index].x;
-  camera.position.y = this.queue[curr_annot_index].y;
-  camera.position.z = this.queue[curr_annot_index].z;
+  //If condition to wrap around if last annotation
+  if(this.queue.curr_annot_index>this.queue.length -1){ this.queue.curr_annot_index=0; }
+  camera.position.x = this.queue[this.queue.curr_annot_index].camera_position.x;
+  camera.position.y = this.queue[this.queue.curr_annot_index].camera_position.y;
+  camera.position.z = this.queue[this.queue.curr_annot_index].camera_position.z;
 
-  controls.target = this.queue[curr_annot_index].camera_target;
+  controls.target = this.queue[this.queue.curr_annot_index].camera_target;
   camera.up = new THREE.Vector3(0,1,0);
 
   for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
-    if(i!=curr_annot_index){
+    if(i!=this.queue.curr_annot_index){
       document.getElementById("tooltip"+i).style.visibility='hidden';
     }
     else{
@@ -579,21 +471,24 @@ AnnotationSet.prototype.NextView = function(){
   }
 
 };
+
 AnnotationSet.prototype.PreviousView = function(){
+  console.log("this.queue[this.queue.curr_annot_index].camera_position.x= ", this.queue[this.queue.curr_annot_index].camera_position.x);
   this.queue.curr_annot_index-=1;
 
+  //If condition to wrap around if first annotation
+  if(this.queue.curr_annot_index<0){ this.queue.curr_annot_index=this.queue.length-1; }
+  console.log("this.queue.curr_annot_index= ", this.queue.curr_annot_index)
 
-  //If ccondition to wrap around if first annotation
-  if(curr_annot_index==0){ curr_annot_index=this.queue.length-1; }
-  camera.position.x = this.queue[curr_annot_index].x;
-  camera.position.y = this.queue[curr_annot_index].y;
-  camera.position.z = this.queue[curr_annot_index].z;
+  camera.position.x = this.queue[this.queue.curr_annot_index].camera_position.x;
+  camera.position.y = this.queue[this.queue.curr_annot_index].camera_position.y;
+  camera.position.z = this.queue[this.queue.curr_annot_index].camera_position.z;
 
-  controls.target = this.queue[curr_annot_index].camera_target;
+  controls.target = this.queue[this.queue.curr_annot_index].camera_target;
   camera.up = new THREE.Vector3(0,1,0);
 
   for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
-    if(i!=curr_annot_index){
+    if(i!=this.queue.curr_annot_index){
       document.getElementById("tooltip"+i).style.visibility='hidden';
     }
     else{
@@ -603,77 +498,41 @@ AnnotationSet.prototype.PreviousView = function(){
 
 };
 
-//Erase when objects are put in seperate folders
-var Annotation_Set = new AnnotationSet();
-//Same function as leftArrowKeyDown, modified to satisfy datGUI with no error handling
-function ChangeCameraView() {
+//TODO:Recode this function with new AnnotationSet object
+//Add StopTour function
+var playing_tour = true;
+AnnotationSet.prototype.PlayTour = function(){
 
-    console.log("Changed Camera View");
-    console.log("Group.position = ",group.position);
-    // console.log(camlookatpoints[camcounter]);
-    console.log(campositions[camcounter]);
-    // camera.lookAt(camlookatpoints[camcounter]);
-    // controls.target(camlookatpoints[camcounter]);
-    camera.position.x=campositions[camcounter].x;
-    camera.position.y=campositions[camcounter].y;
-    camera.position.z=campositions[camcounter].z;
-    console.log('cam counter');
-    console.log(camcounter);
-  //  controls.target = camlookatpoints[camcounter];
+  if(playing_tour==true){
+    this.queue.curr_annot_index = 0;
+    camera.position.x = this.queue[this.queue.curr_annot_index].camera_position.x;
+    camera.position.y = this.queue[this.queue.curr_annot_index].camera_position.y;
+    camera.position.z = this.queue[this.queue.curr_annot_index].camera_position.z;
+    controls.target = this.queue[this.queue.curr_annot_index].camera_target;
 
+    console.log("camera.up=",camera.up);
+    // controls.target=AnnotCamLookatPts[tour_counter];
+    camera.up = new THREE.Vector3(0,1,0);
 
+    datGUI.add(cameraGUI, 'nextview');
+    datGUI.add(cameraGUI, 'previousview');
 
-
-    if (camcounter != numOfAnnotations -1) {
-      camcounter+= 1;
-    }
-    else {
-      camcounter = 0;
-    }
-    if(annotcounter != 0){
-      var element = document.getElementById("newdiv");
-      element.parentNode.removeChild(element);
-      console.log('remove');
-    }
-    var mydiv = document.getElementById('mydiv');
-    console.log(mydiv);
-    var newdiv = document.createElement("div");
-    //var tooltip = '<div class="tooltip"><p>This is a tooltip. It is typically used to explain something to a user without taking up space on the page.</p></div>'
-      newdiv.innerHTML = "<p>This is a tooltip. It is typically used to explain something to a user without taking up space on the page.</p>"
-      newdiv.setAttribute("class", "bubble");
-      newdiv.setAttribute("id", "newdiv");
-      mydiv.appendChild(newdiv);
-      console.log('Im fine');
-
-      //Change annotation
-      var color = window.getComputedStyle(
-        document.querySelector('.bubble'), ':after'
-      ).getPropertyValue('left');
-      console.log(color);
-      color = "30px";
-
-      console.log(color);
-
-      console.log(annotcounter);
-
-      var list = document.getElementsByClassName("bubble")[0];
-      list.style.top = "10px";
-      list.style.left = "1px";
-        annotcounter+= 1;
-
-      //ChangeAnnotation
-
+    playing_tour=false;
+  }
 
 }
 
-//Second part of leftArrowKeyDown function to reset camera, but satisfying datGUI    else if (keyCode ==39) {
-function ResetCamera() {
+//Delete when objects are put in seperate folders
+var Annotation_Set = new AnnotationSet();
 
-      camera.lookAt(camlookat_start);
-      camera.position.x = camposition_start.x;
-      camera.position.x = camposition_start.y;
-      camera.position.x = camposition_start.z;
-      console.log('Reset camera');
+//TODO: Recode this function and put in GUI to handle user putting object out of sight
+function ResetCamera() {
+      //
+      // camera.lookAt(camlookat_start);
+      // camera.position.x = camposition_start.x;
+      // camera.position.x = camposition_start.y;
+      // camera.position.x = camposition_start.z;
+      // console.log('Reset camera');
 }
 
 function NkeyDown(event){
@@ -691,7 +550,6 @@ function SkeyDown(event){
   if(keyCode==83){
     window.removeEventListener("keydown", SkeyDown, false);
     var CurrCamPos = new THREE.Vector3();
-    // console.log("camera.position = ", camera.position)
     CurrCamPos.set(camera.position.x, camera.position.y, camera.position.z);
     console.log("CurrCamPos = ", CurrCamPos);
     //AnnotCamPos.push(CurrCamPos)
@@ -716,11 +574,7 @@ function SkeyDown(event){
       tooltiptext[Tips_array_current_index] = newValue;
       console.log('-------New tooltip text ', tooltiptext[Tips_array_current_index]);
       console.log('-------On Change TOOLTIP_ID ', "tooltip"+Tips_array_current_index );
-      // for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
-      //   if(i!=tour_counter){
-      //     document.getElementById("tooltip"+i).style.visibility='hidden';
-      //   }
-      // }
+
       ChangeToolTipText(tooltiptext[Tips_array_current_index], "tooltip"+Tips_array_current_index);
 
     });
@@ -731,65 +585,6 @@ function SkeyDown(event){
     console.log("AnnotCamPos=  ", AnnotCamPos[camcounter -1]);
 
   }
-
-}
-
-function AkeyDown(event){
-  AkeyIsDown = false;
-  var keyCode = event.keyCode;
-  console.log(keyCode);
-  if(keyCode==66){
-    //AkeyIsDown = true;
-    console.log("AkeyDownCheckIntersection", AkeyIsDown);
-    FreezeSphere(CurrSphereData[0], CurrSphereData[1]);
-
-    console.log("Freeze Sphere fctn camcounter = ", camcounter);
-  }
-  //Press S if A key has been pressed
-  //TODO:This elseif statement should be a SaveView function called if in EditMode and New View fucntion was called
-    //  Save View should be:
-    //Create NewView then Select New View to edit it
-  else if (keyCode==83 && AkeyIsDown==true){
-
-
-    console.log("INSIDE 83--------S Key Down");
-    console.log("camcounter at CamPosEdit", camcounter);
-    var CurrCamPos = new THREE.Vector3();
-    // console.log("camera.position = ", camera.position)
-    CurrCamPos.set(camera.position.x, camera.position.y, camera.position.z);
-    console.log("CurrCamPos = ", CurrCamPos);
-    AnnotCamPos.push(CurrCamPos);
-    cameraGUI.Annot[camcounter] = AnnotCamPos[camcounter].x;
-    ViewMenu.add(cameraGUI.Annot, camcounter, cameraGUI.Annot[camcounter]).listen();
-    for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
-      if(i!=camcounter){
-        document.getElementById("tooltip"+i).style.visibility='hidden';
-      }
-    }
-
-    cameraGUI.Tips[camcounter] = 'Tip'+camcounter;
-    ViewMenu.add(cameraGUI.Tips, camcounter, cameraGUI.Tips[camcounter]).onChange(function(newValue){
-      var Tips_array_current_index = this.property;
-      console.log('-------Previous tooltip text = ', Tips_array_current_index);
-      tooltiptext[Tips_array_current_index] = newValue;
-      console.log('-------New tooltip text ', tooltiptext[Tips_array_current_index]);
-      console.log('-------On Change TOOLTIP_ID ', "tooltip"+Tips_array_current_index );
-      // for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
-      //   if(i!=tour_counter){
-      //     document.getElementById("tooltip"+i).style.visibility='hidden';
-      //   }
-      // }
-      ChangeToolTipText(tooltiptext[Tips_array_current_index], "tooltip"+Tips_array_current_index);
-
-    });
-
-    CreateToolTip(tooltiptext[camcounter], camcounter);
-    // ViewMenu.add(cameraGUI, 'annotcampos').listen();
-    camcounter += 1;
-    console.log("AnnotCamPos=  ", AnnotCamPos[camcounter -1]);
-
-  }
-  console.log("AkeyIsDOOOOOOWWWNN", AkeyIsDown);
 
 }
 
@@ -825,12 +620,9 @@ function CreateToolTip(tooltiptext, camcounter){
 
   console.log(color);
 
-  console.log(annotcounter);
-
   var list = document.getElementsByClassName("bubble")[0];
   list.style.top = "10px";
   list.style.left = "1px";
-  annotcounter+= 1;
 
 }
 
@@ -909,30 +701,8 @@ function ChooseCameraPos(){
 }
 
 
-var playing_tour = true;
-function PlayTour(){
 
-  if(playing_tour==true){
-    tour_counter=0;
-    camera.position.x=AnnotCamPos[tour_counter].x;
-    camera.position.y=AnnotCamPos[tour_counter].y;
-    camera.position.z=AnnotCamPos[tour_counter].z;
-
-    console.log("camera.up=",camera.up);
-    // camera.lookAt(AnnotCamLookatPts[camcounter_gui]);
-    controls.target=AnnotCamLookatPts[tour_counter];
-    camera.up = new THREE.Vector3(0,1,0);
-
-    datGUI.add(cameraGUI, 'nextview');
-    datGUI.add(cameraGUI, 'previousview');
-
-    playing_tour=false;
-  }
-
-
-
-}
-
+//TODO:Recode this function with new AnnotationSet object
 function SelectViewFromIndex(view_index){
 
   camera.position.x=AnnotCamPos[view_index].x;
@@ -950,63 +720,15 @@ function SelectViewFromIndex(view_index){
   }
 }
 
-//TODO:Should be a variation of SelectView function
-  //Should just slect next view in the Queue
-function NextView(){
-  console.log('----------NEXT VIEW------------');
-  tour_counter+=1;
-  if(tour_counter>AnnotCamPos.length-1){ tour_counter=AnnotCamPos.length -1; }
-  camera.position.x=AnnotCamPos[tour_counter].x;
-  camera.position.y=AnnotCamPos[tour_counter].y;
-  camera.position.z=AnnotCamPos[tour_counter].z;
-
-  console.log("camera.up=",camera.up);
-  // camera.lookAt(AnnotCamLookatPts[camcounter_gui]);
-  controls.target=AnnotCamLookatPts[tour_counter];
-  camera.up = new THREE.Vector3(0,1,0);
-  console.log('------TOUR COUNTER---- =', tour_counter);
-  for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
-    if(i!=tour_counter){
-      document.getElementById("tooltip"+i).style.visibility='hidden';
-    }
-    else{
-      document.getElementById("tooltip"+i).style.visibility='visible';
-    }
-  }
 
 
-}
-
-function PreviousView(){
-
-  tour_counter-=1;
-  if (tour_counter<0){ tour_counter=0; }
-  camera.position.x=AnnotCamPos[tour_counter].x;
-  camera.position.y=AnnotCamPos[tour_counter].y;
-  camera.position.z=AnnotCamPos[tour_counter].z;
-
-  console.log("camera.up=",camera.up);
-  // camera.lookAt(AnnotCamLookatPts[camcounter_gui]);
-  controls.target=AnnotCamLookatPts[tour_counter];
-  camera.up = new THREE.Vector3(0,1,0);
-  console.log('------TOUR COUNTER---- =', tour_counter);
-  for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
-    if(i!=tour_counter){
-      document.getElementById("tooltip"+i).style.visibility='hidden';
-    }
-    else{
-      document.getElementById("tooltip"+i).style.visibility='visible';
-    }
-  }
-
-
-}
 //TODO: Make EraseTour function and EditSlectedView function
 
 Array.prototype.move = function (from, to) {
   this.splice(to, 0, this.splice(from, 1)[0]);
 };
 
+//TODO: Adapt this to new AnnotationSet object
 function ChangeAnnotOrder(){
   console.log("-----Before Move AnnotCamPos =",AnnotCamPos[0]);
   console.log("-----Before Move AnnotCamPos =",AnnotCamPos[1]);
@@ -1086,13 +808,4 @@ function render() {
   // css3d_renderer.render ( scene, camera);
 
     var intersects = raycaster.intersectObjects(scene.children);
-    //console.log(intersects);
-
-    // camera.lookAt(stl_1.position)
-    // camera.position.x=stl_1.position.x - camcounter*10;
-    // camera.position.y=stl_1.position.y + camcounter*10 ;
-    // camera.position.z=CAMERA_DISTANCE+20;
-    //
-    // camcounter += 1;
-    // console.log(camcounter);
 }
