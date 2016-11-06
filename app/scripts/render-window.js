@@ -535,17 +535,20 @@ var AnnotationObj = function (camlookatpoint, camposition) {
 
 
 var AnnotationSet = function () {
+    this.name = "Name";
     this.queue = [];
     this.queue.curr_annot_index = 0;
-    this.num_of_annot = 0;
 };
 
 AnnotationSet.prototype.AddAnnotation = function(AnnotationObj) {
   this.queue.push(AnnotationObj);
 };
+
+//Delete when Object is put in seperate file
+var temp_array
 AnnotationSet.prototype.DeleteAnnotation = function(queue_index){
-  var temp_array = [];
-  for(var i=0; i<this.num_of_annot-1; i++){
+  temp_array = [];
+  for(var i=0; i<this.queue.length-1; i++){
     if(i!=queue_index){
       temp_array[i] = this.queue[i];
     }
@@ -558,7 +561,7 @@ AnnotationSet.prototype.NextView = function(){
   this.queue.curr_annot_index+=1;
 
   //If ccondition to wrap around if last annotation
-  if(curr_annot_index>this.queue.num_of_annot -1){ curr_annot_index=0; }
+  if(curr_annot_index>this.queue.length -1){ curr_annot_index=0; }
   camera.position.x = this.queue[curr_annot_index].x;
   camera.position.y = this.queue[curr_annot_index].y;
   camera.position.z = this.queue[curr_annot_index].z;
@@ -581,7 +584,7 @@ AnnotationSet.prototype.PreviousView = function(){
 
 
   //If ccondition to wrap around if first annotation
-  if(curr_annot_index==0){ curr_annot_index=this.queue.num_of_annot-1; }
+  if(curr_annot_index==0){ curr_annot_index=this.queue.length-1; }
   camera.position.x = this.queue[curr_annot_index].x;
   camera.position.y = this.queue[curr_annot_index].y;
   camera.position.z = this.queue[curr_annot_index].z;
@@ -601,7 +604,7 @@ AnnotationSet.prototype.PreviousView = function(){
 };
 
 //Erase when objects are put in seperate folders
-var Homo_Erectus_Annotations = new AnnotationSet();
+var Annotation_Set = new AnnotationSet();
 //Same function as leftArrowKeyDown, modified to satisfy datGUI with no error handling
 function ChangeCameraView() {
 
@@ -694,9 +697,9 @@ function SkeyDown(event){
     //AnnotCamPos.push(CurrCamPos)
     annot_buffer.camera_position.copy(CurrCamPos);
     console.log("BUFFER", annot_buffer);
-    Homo_Erectus_Annotations.AddAnnotation(annot_buffer);
+    Annotation_Set.AddAnnotation(annot_buffer);
     console.log(annot_buffer.name, "ADDED ANNOTATION TO ANNOTATION SET");
-    console.log(Homo_Erectus_Annotations, "THIS IS THE ANNOTATION SET");
+    console.log(Annotation_Set, "THIS IS THE ANNOTATION SET");
     cameraGUI.Annot[camcounter] = annot_buffer.camera_position.x;
     ViewMenu.add(cameraGUI.Annot, camcounter, cameraGUI.Annot[camcounter]).listen();
     for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
