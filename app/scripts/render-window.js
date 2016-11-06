@@ -50,6 +50,7 @@ campositions[3] = new THREE.Vector3(0,0,20);
 var AnnotSpheres = [];
 var AnnotCamPos = [];
 var AnnotCamLookatPts = [];
+
 //Configuration variables set in edit mode
 
 var textureLoader = new THREE.TextureLoader();
@@ -506,9 +507,12 @@ function leftArrowKeyDown(event) {
     // }
 }
 
+var annot_obj_counter = 0;
 var AnnotationObj = function (camlookatpoint, camposition) {
 
   console.log("New annotation created");
+  this.name = "annotation_"+annot_obj_counter;
+  annot_obj_counter+=1;
   //camcounter+=1;
 
   //This is the 2D div
@@ -527,8 +531,77 @@ var AnnotationObj = function (camlookatpoint, camposition) {
   this.camera_target.copy(camlookatpoint);
   this.camera_position.copy(camposition);
 
-}
+};
 
+
+var AnnotationSet = function () {
+    this.queue = [];
+    this.queue.curr_annot_index = 0;
+    this.num_of_annot = 0;
+};
+
+AnnotationSet.prototype.AddAnnotation = function(AnnotationObj) {
+  this.queue.push(AnnotationObj);
+};
+AnnotationSet.prototype.DeleteAnnotation = function(queue_index){
+  var temp_array = [];
+  for(var i=0; i<this.num_of_annot-1; i++){
+    if(i!=queue_index){
+      temp_array[i] = this.queue[i];
+    }
+  }
+  this.queue = temp_array;
+  temp_array = null;
+};
+
+AnnotationSet.prototype.NextView = function(){
+  this.queue.curr_annot_index+=1;
+
+  //If ccondition to wrap around if last annotation
+  if(curr_annot_index>this.queue.num_of_annot -1){ curr_annot_index=0; }
+  camera.position.x = this.queue[curr_annot_index].x;
+  camera.position.y = this.queue[curr_annot_index].y;
+  camera.position.z = this.queue[curr_annot_index].z;
+
+  controls.target = this.queue[curr_annot_index].camera_target;
+  camera.up = new THREE.Vector3(0,1,0);
+
+  for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
+    if(i!=curr_annot_index){
+      document.getElementById("tooltip"+i).style.visibility='hidden';
+    }
+    else{
+      document.getElementById("tooltip"+i).style.visibility='visible';
+    }
+  }
+
+};
+AnnotationSet.prototype.PreviousView = function(){
+  this.queue.curr_annot_index-=1;
+
+
+  //If ccondition to wrap around if first annotation
+  if(curr_annot_index==0){ curr_annot_index=this.queue.num_of_annot-1; }
+  camera.position.x = this.queue[curr_annot_index].x;
+  camera.position.y = this.queue[curr_annot_index].y;
+  camera.position.z = this.queue[curr_annot_index].z;
+
+  controls.target = this.queue[curr_annot_index].camera_target;
+  camera.up = new THREE.Vector3(0,1,0);
+
+  for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
+    if(i!=curr_annot_index){
+      document.getElementById("tooltip"+i).style.visibility='hidden';
+    }
+    else{
+      document.getElementById("tooltip"+i).style.visibility='visible';
+    }
+  }
+
+};
+
+//Erase when objects are put in seperate folders
+var Homo_Erectus_Annotations = new AnnotationSet();
 //Same function as leftArrowKeyDown, modified to satisfy datGUI with no error handling
 function ChangeCameraView() {
 
@@ -621,6 +694,9 @@ function SkeyDown(event){
     //AnnotCamPos.push(CurrCamPos)
     annot_buffer.camera_position.copy(CurrCamPos);
     console.log("BUFFER", annot_buffer);
+    Homo_Erectus_Annotations.AddAnnotation(annot_buffer);
+    console.log(annot_buffer.name, "ADDED ANNOTATION TO ANNOTATION SET");
+    console.log(Homo_Erectus_Annotations, "THIS IS THE ANNOTATION SET");
     cameraGUI.Annot[camcounter] = annot_buffer.camera_position.x;
     ViewMenu.add(cameraGUI.Annot, camcounter, cameraGUI.Annot[camcounter]).listen();
     for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
@@ -769,6 +845,7 @@ function ChangeToolTipText(tooltiptext, tooltip_id){
 
 
 function NewAnnotation(){
+  console.log("Creating new annotation");
   window.addEventListener("keydown", NkeyDown, false);
 }
 
