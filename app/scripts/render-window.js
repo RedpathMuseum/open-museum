@@ -25,9 +25,9 @@ var camposition_start = new THREE.Vector3(-5.488823519163917, 4.861637666233516,
 var AnnotSpheres = [];
 var AnnotCamPos = [];
 var AnnotCamLookatPts = [];
-
 //Configuration variables set in edit mode
 
+//Needed for OBJLoader
 var textureLoader = new THREE.TextureLoader();
 
 
@@ -454,13 +454,31 @@ AnnotationSet.prototype.NextView = function(){
 
   //If condition to wrap around if last annotation
   if(this.queue.curr_annot_index>this.queue.length -1){ this.queue.curr_annot_index=0; }
-  camera.position.x = this.queue[this.queue.curr_annot_index].camera_position.x;
-  camera.position.y = this.queue[this.queue.curr_annot_index].camera_position.y;
-  camera.position.z = this.queue[this.queue.curr_annot_index].camera_position.z;
+  // camera.position.x = this.queue[this.queue.curr_annot_index].camera_position.x;
+  // camera.position.y = this.queue[this.queue.curr_annot_index].camera_position.y;
+  // camera.position.z = this.queue[this.queue.curr_annot_index].camera_position.z;
+  var from = {
+    x: camera.position.x,
+    y: camera.position.y,
+    z: camera.position.z
+};
+var to = {
+  x: this.queue[this.queue.curr_annot_index].camera_position.x,
+  y: this.queue[this.queue.curr_annot_index].camera_position.y,
+  z: this.queue[this.queue.curr_annot_index].camera_position.z
+};
+  var tween = new TWEEN.Tween(from)
+    .to(to, 600)
+    .easing(TWEEN.Easing.Linear.None)
+    .onUpdate(function () {
+    camera.position.set(this.queue[this.queue.curr_annot_index].camera_position.x, this.queue[this.queue.curr_annot_index].camera_position.y, this.queue[this.queue.curr_annot_index].camera_position.z);
+    camera.lookAt(this.queue[this.queue.curr_annot_index].camera_target);
+})
 
-  controls.target = this.queue[this.queue.curr_annot_index].camera_target;
+  // controls.target = this.queue[this.queue.curr_annot_index].camera_target;
   camera.up = new THREE.Vector3(0,1,0);
 
+//TODO:Make this a function of AnnotationSet
   for(var i = 0; i<= cameraGUI.Tips.length-1; i++){
     if(i!=this.queue.curr_annot_index){
       document.getElementById("tooltip"+i).style.visibility='hidden';
@@ -499,7 +517,7 @@ AnnotationSet.prototype.PreviousView = function(){
 };
 
 //TODO:Recode this function with new AnnotationSet object
-//Add StopTour function
+//TODO:Add StopTour function
 var playing_tour = true;
 AnnotationSet.prototype.PlayTour = function(){
 
@@ -723,7 +741,6 @@ function SelectViewFromIndex(view_index){
 
 
 //TODO: Make EraseTour function and EditSlectedView function
-
 Array.prototype.move = function (from, to) {
   this.splice(to, 0, this.splice(from, 1)[0]);
 };
