@@ -9,7 +9,7 @@
     "THREEOrbitControls": "^71.1.0",
     "dat-gui": "^0.5.1",
     "tween.js": "tweenjs#^16.3.5",
-    "dat.gui": "dat-gui#^0.6.1"
+    "dat.gui": "dat-gui#^0.6.2"
   },
   "overrides": {
     "bootstrap-sass": {
