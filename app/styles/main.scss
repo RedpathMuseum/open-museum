@@ -12,9 +12,12 @@ $icon-font-path: '../fonts/';
 }
 
 /* Space out content a bit */
-body {
-  /* padding-top: 20px; */
-  /* padding-bottom: 20px; */
+html, body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  height: 100%;
+  // overflow: hidden;
+  margin: 0;
 }
 
 img {
