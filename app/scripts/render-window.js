@@ -180,7 +180,7 @@ function init() {
     renderer = new THREE.WebGLRenderer({canvas: canvas3D} );
     // renderer.setSize( window.innerWidth, window.innerHeight );
     console.log( document.getElementById('3d_content').getBoundingClientRect());
-    renderer.setSize( document.getElementById('3d_content').getBoundingClientRect().width, document.getElementById('3d_content').getBoundingClientRect().width );
+    renderer.setSize( document.getElementById('3d_content').getBoundingClientRect().width, window.innerHeight );
     renderer.setClearColor( 0xF2F2F2, 1);
 
     // CSS3D Renderer
@@ -841,12 +841,13 @@ function loadJSON( callback ) {
 function onWindowResize() {
 
 
-      camera.aspect = window.innerWidth / window.innerHeight;
+      // camera.aspect = window.innerWidth / window.innerHeight;
+      camera.aspect = document.getElementById('3d_content').getBoundingClientRect().width/window.innerHeight;
 
       camera.updateProjectionMatrix();
 
       // renderer.setSize( window.innerWidth, window.innerHeight );
-      renderer.setSize( document.getElementById('3d_content').getBoundingClientRect().width, document.getElementById('3d_content').getBoundingClientRect().width );
+      renderer.setSize( document.getElementById('3d_content').getBoundingClientRect().width, window.innerHeight );
 
 }
 
