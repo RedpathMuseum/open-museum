@@ -178,7 +178,9 @@ function init() {
 
     // renderer
     renderer = new THREE.WebGLRenderer({canvas: canvas3D} );
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    // renderer.setSize( window.innerWidth, window.innerHeight );
+    console.log( document.getElementById('3d_content').getBoundingClientRect());
+    renderer.setSize( document.getElementById('3d_content').getBoundingClientRect().width, document.getElementById('3d_content').getBoundingClientRect().width );
     renderer.setClearColor( 0xF2F2F2, 1);
 
     // CSS3D Renderer
@@ -471,7 +473,7 @@ AnnotationSet.prototype.NextView = function(){
     z: this.queue[this.queue.curr_annot_index].camera_position.z
   };
   var tween_camera = new TWEEN.Tween(from)
-    .to(to, 1000)
+    .to(to, 3000)
     .easing(TWEEN.Easing.Exponential.InOut)
     .onUpdate(function () {
 
@@ -843,7 +845,8 @@ function onWindowResize() {
 
       camera.updateProjectionMatrix();
 
-      //renderer.setSize( window.innerWidth, window.innerHeight );
+      // renderer.setSize( window.innerWidth, window.innerHeight );
+      renderer.setSize( document.getElementById('3d_content').getBoundingClientRect().width, document.getElementById('3d_content').getBoundingClientRect().width );
 
 }
 
